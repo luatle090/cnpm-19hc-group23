@@ -15,9 +15,17 @@
         <md-icon>content_paste</md-icon>
         <p>Bảo dưỡng</p>
       </sidebar-link>
+      <sidebar-link v-show="nvBaoDuong" to="/xekhachtra">
+        <md-icon>content_paste</md-icon>
+        <p>Kiểm tra xe khách trả</p>
+      </sidebar-link>
       <sidebar-link v-show="quanLy"  to="/xeoto">
         <md-icon>content_paste</md-icon>
         <p>Xe Ô tô</p>
+      </sidebar-link>
+      <sidebar-link v-show="quanLy"  to="/baocao">
+        <md-icon>content_paste</md-icon>
+        <p>Báo cáo</p>
       </sidebar-link>
 
       <!-- <sidebar-link to="/user">

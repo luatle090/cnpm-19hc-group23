@@ -3,65 +3,69 @@
     <div class="md-layout">
       <div class="md-layout-item md-medium-size-100 md-size-100">
         <b-alert v-model="show" :variant="erro ? 'danger' : 'success'"  dismissible>{{ message }}</b-alert>
-        <form v-on:submit.prevent="themMoi">
+        <form v-on:submit.prevent="updateBaoDuong">
           <md-card>
             <md-card-header data-background-color="green">
               <h4 class="title">{{ title }}</h4>
             </md-card-header>
             <md-card-content>
               <div class="md-layout">
-                <div v-show="update" class="md-layout-item md-small-size-100 md-size-100">
+                <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
                     <label>Số hiệu xe</label>
                     <md-input required disabled v-model.trim="soHieuXe" type="text" ></md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
+                    <md-datepicker v-model="ngayKiemTra" required md-immediately>
+                      <label>Ngày kiểm tra</label>
+                    </md-datepicker>    
+                </div>
+                <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
-                    <label>Hãng xe</label>
-                    <md-input v-bind:value="hangXe" required type="text" ></md-input>
+                    <label>Tình trạng</label>
+                    <md-input v-model="tinhTrang" required type="text" ></md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
-                    <label>Dòng xe</label>
-                    <md-input required v-model.trim="dongXe" type="text"> </md-input>
+                    <label>Lốp xe</label>
+                    <md-input required v-model="lopXe" type="text"> </md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
-                    <label>Màu sắc</label>
-                    <md-input v-model.trim="mauSac" required type="text" ></md-input>
-                  </md-field>
-                </div>
-                 <div class="md-layout-item md-small-size-100 md-size-100">
-                  <md-field>
-                    <label>Giá thuê</label>
-                    <md-input v-model.trim="giaThue" required type="text" ></md-input>
+                    <label>Vỏ xe</label>
+                    <md-input v-model.trim="voXe" required type="text" ></md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
-                    <label>Giá trị thật của xe</label>
-                    <md-input v-model.trim="giaTriXe" required type="text" ></md-input>
+                    <label>Ghế xe</label>
+                    <md-input v-model.trim="gheXe" required type="text" ></md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
-                    <label>Phần trăm đặt cọc</label>
-                    <md-input v-model.number="percentDatCoc" required type="number" ></md-input>
+                    <label>Gương chiếu hậu</label>
+                    <md-input v-model.trim="guongChieuHau" required type="text" ></md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
-                    <label>Số tiền đặt cọc</label>
-                    <md-input v-model="datCoc" disabled type="text" ></md-input>
+                    <label>Hệ thống thắng xe</label>
+                    <md-input v-model.trim="thangXe" required type="text" ></md-input>
+                  </md-field>
+                </div>
+                <div class="md-layout-item md-small-size-100 md-size-100">
+                  <md-field>
+                    <label>Túi khí</label>
+                    <md-input v-model.trim="tuiKhi" required type="text" ></md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100 text-right">
-                  <md-button type="button" to="/xeoto" class="btn-huy md-raised md-danger">Quay lại</md-button>
-                  <md-button v-show="!update" type="submit" class="md-raised md-success">Thêm mới</md-button>
-                  <md-button v-show="update" type="submit" class="md-raised md-success">Cập nhật</md-button>
+                  <md-button type="button" to="/xekhachtra" class="btn-huy md-raised md-danger">Quay lại</md-button>
+                  <md-button type="submit" class="md-raised md-success">Cập nhật</md-button>
                 </div>
               </div>
             </md-card-content>
@@ -77,49 +81,31 @@ import { VMoney } from "v-money";
 import { mapActions } from "vuex";
 
 export default {
-  name: "createHopDong",
-  props: {
-    update:{
-      type: Boolean
-    }
-  },
+  name: "updateBaoDuong",
   data() {
     return {
       erro: false,
       show: false,
-      soHieuXe: "Innova09",
-      hangXe: "Toyota",
-      dongXe: "Sendai",
-      mauSac: "Trắng xanh",
-      giaThue: "4.000.000 VNĐ",
-      giaTriXe: "650.000.000 VNĐ",
-      percentDatCoc: 4,
-      datCoc: "26.000.000 VNĐ",
+      voXe: "Thay thế",
+      lopXe: "Thay thế",
+      tinhTrang: "Hỏng hóc",
+      tuiKhi: "Bình thường",
+      thangXe: "Thay thế",
+      guongChieuHau: "Bình thường",
+      ngayKiemTra: "14/06/2020",
+      gheXe: "Bình thường",
+      soHieuXe: "Innova01",
       message: "",
-      title: "Thêm mới xe thuê"
+      title: "Cập nhật tình trạng xe khách trả"
     };
   },
 
- mounted() {
-    if(this.update === true){
-      return this.updateXeOto();
-    }
-  },
-
   methods: {
-    themMoi(){
+    updateBaoDuong(){
       this.show = true;
-      if(this.update === true){
-        this.message = "Cập nhật xe ô tô thành công";
-      }
-      else{
-        this.message = "Thêm mới xe ô tô thành công";
-      }
+      this.message = "Cập nhật tình trạng thành công";
+      
     },
-
-    updateXeOto(){
-      this.title = "Cập nhật xe ô tô";
-    }
   }
 };
 </script>

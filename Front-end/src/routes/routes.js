@@ -94,6 +94,30 @@ const routes = [
         path: "taoxeoto",
         name: "Tạo Ô tô",
         component: () => import("../pages/XeOto/CreateXeOto"),
+        props: true
+      },
+      {
+        path: "xekhachtra",
+        name: "Kiểm tra xe khách trả",
+        component: () => import("../pages/XeKhachTra/HomeXeKhachTra"),
+        props: true
+      },
+      {
+        path: "updateXeKhachTra",
+        name: "Cập nhật xe khách trả",
+        component: () => import("../pages/XeKhachTra/UpdateXeKhachTra"),
+        props: true
+      },
+      {
+        path: "detailxekhachtra",
+        name: "Chi tiết tình trạng xe khách trả",
+        component: () => import("../pages/XeKhachTra/DetailXeKhachTra"),
+        props: true
+      },
+      {
+        path: "baocao",
+        name: "Báo cáo",
+        component: () => import("../pages/BaoCao/BaoCaoDoanhSo"),
       },
       {
         path: "thietlapnguoinhan",

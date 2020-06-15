@@ -17,23 +17,20 @@
                             </div>
                              <div class="md-layout-item md-small-size-100 md-size-30">
                                 <md-field>
-                                    <label>Hãng xe</label>
-                                    <md-input v-model="filter.hangXe"></md-input>
+                                    <label>Tình trạng</label>
+                                    <md-input v-model="filter.tinhTrang"></md-input>
                                 </md-field>
                             </div>
-                             <div class="md-layout-item md-small-size-100 md-size-30">
-                                <md-field>
-                                    <label>Dòng xe</label>
-                                    <md-input v-model="filter.dongXe"></md-input>
-                                </md-field>
+                            <div class="md-layout-item md-small-size-100 md-size-30">
+                                <md-datepicker v-model="filter.ngayThueXe" required md-immediately>
+                                    <label>Ngày kiểm tra</label>
+                                    <md-input v-model="filter.ngayKiemTra"></md-input>
+                                </md-datepicker>
                             </div>
                         </div>
 
                          <div class="md-layout-item md-small-size-100 md-size-100 text-right">
                              <md-button class="btn-search md-raised md-success">Tìm kiếm</md-button>
-                            <md-button type="button" to="/taoxeoto" class="md-raised md-success btn-size">
-                                Thêm xe thuê
-                            </md-button>
                         </div>
                         <div>
                             <b-table id="my-table" striped hover 
@@ -51,27 +48,20 @@
                             </template>
                             <template v-slot:cell(actions)="row">
                                 <div class="md-table-cell-container">
-                                    <button title="Chi tiết" type="button" @click="detailedNhacNo(row.item.id)" 
+                                    <button title="Chi tiết quá trình kiểm tra" type="button" @click="xemChiTiet(row.item.id)" 
                                         class="md-button md-just-icon md-theme-default md-info md-simple"
                                     >
                                         <div class="md-ripple"> <div class="md-button-content">
                                         <md-icon>info</md-icon>
                                         </div></div>
                                     </button>
-                                   <button title="Cập nhật" type="button" @click="updateXeOto(row.item.id)" 
+                                    <button v-show="row.item.tinhTrang === 'Cần kiểm tra'" title="Cập nhật tình trạng" type="button" @click="updateKiemTra(row.item.id)" 
                                         class="md-button md-just-icon md-theme-default md-info md-simple"
                                     >
                                         <div class="md-ripple"> <div class="md-button-content">
                                         <md-icon>edit</md-icon>
                                         </div></div>
-                                    </button>
-                                    <button type="button" title="Xóa" @click="deleteXeOto(row)" 
-                                        class="md-button md-just-icon md-theme-default md-danger md-simple"
-                                    >
-                                        <div class="md-ripple"> <div class="md-button-content">
-                                        <md-icon>delete</md-icon>
-                                        </div></div>
-                                    </button>
+                                    </button> 
                                 </div>
                             </template>
                             
@@ -105,7 +95,7 @@ export default {
     props: ['showMS'],
     data() {
         return {
-            title: 'Quản lý xe ô tô',
+            title: 'Kiểm tra xe khách trả',
             currentPage: 1,
             perPage: 10,
             totalRows: 21,
@@ -115,17 +105,16 @@ export default {
             show: false,
             filter: {
                 soHieuXe: "",
-                dongXe: null,
-                hangXe: null
+                ngayKiemTra: null,
+                tinhTrang: "",
             },
 
             headers: [
                 { key: 'soHieuXe', label: 'Số hiệu xe' },
-                { key: 'hangXe', label: 'Họ tên' },
-                { key: 'dongXe', label: 'Số hiệu xe' },
-                { key: 'giaChoThue', label: 'Ngày thuê xe' },
-                { key: 'percentDatCoc', label: '% Đặt cọc' },
-                { key: 'datCoc', label: 'Tiền đặt cọc' },
+                { key: 'hangXe', label: 'Hãng xe' },
+                { key: 'ngayTraXe', label: 'Ngày trả xe' },
+                { key: 'ngayKiemTra', label: 'Ngày kiểm tra' },
+                { key: 'tinhTrang', label: 'Tình trạng' },
                 { key: 'actions', label: 'Thao tác' }
             ],
 
@@ -136,24 +125,29 @@ export default {
             },
 
             dsHopDong: [
-                {soHieuXe: "Toyota01", hangXe: "Toyota", dongXe: "Sendai", giaChoThue: "170.000 VNĐ", percentDatCoc: "5%", datCoc: "7.000.000 VNĐ" },
-                {soHieuXe: "Toyota01", hangXe: "Toyota", dongXe: "Sendai", giaChoThue: "120.000 VNĐ", percentDatCoc: "10%", datCoc: "10.000.000 VNĐ" },
-                {soHieuXe: "Huyndai02", hangXe: "Toyota", dongXe: "Sendai", giaChoThue: "100.000 VNĐ", percentDatCoc: "15%", datCoc: "15.000.000 VNĐ" },
-                {soHieuXe: "Inova01", hangXe: "Toyota", dongXe: "SUV", giaChoThue: "100.000 VNĐ", percentDatCoc: "20%", datCoc: "50.000.000 VNĐ" },
-                {soHieuXe: "Inova02", hangXe: "Toyota", dongXe: "SUV", giaChoThue: "100.000 VNĐ", percentDatCoc: "15%", datCoc: "25.000.000 VNĐ" },
-                {soHieuXe: "Kia01", hangXe: "Toyota", dongXe: "Sendai", giaChoThue: "110.000 VNĐ", percentDatCoc: "15%", datCoc: "20.000.000 VNĐ" },
-                {soHieuXe: "Nissan01", hangXe: "Toyota", dongXe: "Sendai", giaChoThue: "715.000 VNĐ", percentDatCoc: "15%", datCoc: "12.000.000 VNĐ" },
-                {soHieuXe: "Nissan02", hangXe: "Toyota", dongXe: "Sendai", giaChoThue: "435.000 VNĐ", percentDatCoc: "5%", datCoc: "6.000.000 VNĐ" },
-                {soHieuXe: "Kia03", hangXe: "Toyota", dongXe: "SUV", giaChoThue: "460.000 VNĐ", percentDatCoc: "5%", datCoc: "10.000.000 VNĐ" },
-                {soHieuXe: "Toyota03", hangXe: "Toyota", dongXe: "SUV", giaChoThue: "670.000 VNĐ", percentDatCoc: "5%", datCoc: "12.000.000 VNĐ" },
+                {soHieuXe: "Toyota01", hangXe: "Toyota", ngayTraXe: "14/06/2020", ngayKiemTra: "14/05/2020", tinhTrang: "Cần kiểm tra"},
+                {soHieuXe: "Huyndai02", hangXe: "Toyota", ngayTraXe: "09/06/2020", ngayKiemTra: "09/06/2020", tinhTrang: "Đã kiểm tra"},
+                {soHieuXe: "Inova01", hangXe: "Toyota", ngayTraXe: "04/06/2020", ngayKiemTra: "04/06/2020", tinhTrang: "Cần kiểm tra"},
+                {soHieuXe: "Inova02", hangXe: "Toyota", ngayTraXe: "14/06/2020", ngayKiemTra: "14/06/2020", tinhTrang: "Cần kiểm tra"},
+                {soHieuXe: "Kia01", hangXe: "Toyota", ngayTraXe: "14/06/2020", ngayKiemTra: "14/06/2020", tinhTrang: "Cần kiểm tra"},
+                {soHieuXe: "Kia03", hangXe: "Toyota", ngayTraXe: "14/06/2020", ngayKiemTra: "14/06/2020", tinhTrang: "Cần kiểm tra"},
+                {soHieuXe: "Nissan02", hangXe: "Toyota", ngayTraXe: "03/06/2020", ngayKiemTra: "03/06/2020", tinhTrang: "Đã kiểm tra"},
+                {soHieuXe: "Nissan01", hangXe: "Toyota", ngayTraXe: "03/06/2020", ngayKiemTra: "05/06/2020", tinhTrang: "Đã kiểm tra"},
+                {soHieuXe: "Toyota02", hangXe: "Toyota", ngayTraXe: "06/06/2020", ngayKiemTra: "06/06/2020", tinhTrang: "Đã kiểm tra"},
+                {soHieuXe: "Toyota03", hangXe: "Toyota", ngayTraXe: "03/06/2020", ngayKiemTra: "03/06/2020", tinhTrang: "Đã kiểm tra"},
+                {soHieuXe: "Toyota05", hangXe: "Toyota", ngayTraXe: "14/06/2020", ngayKiemTra: "14/06/2020", tinhTrang: "Cần kiểm tra"},
             ]
         };
     },
 
     methods: {
-        updateXeOto(){
-            this.$router.replace({name:'Tạo Ô tô', params:{update : true}});
+        updateKiemTra(){
+            this.$router.replace({name:'Cập nhật xe khách trả', params:{update : true}});
         },
+
+        xemChiTiet(){
+            this.$router.replace({path:'detailxekhachtra'});
+        }
     }
 };
 </script>
