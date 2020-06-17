@@ -330,6 +330,31 @@ INSERT INTO `phutung` VALUES (1,'Vỏ xe',1000000),(2,'Ruột xe',1200000),(3,'T
 UNLOCK TABLES;
 
 --
+-- Table structure for table `refreshtoken`
+--
+
+DROP TABLE IF EXISTS `refreshtoken`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `refreshtoken` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `userId` int(11) NOT NULL,
+  `refreshToken` char(255) COLLATE utf8_bin NOT NULL,
+  `date` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `refreshtoken`
+--
+
+LOCK TABLES `refreshtoken` WRITE;
+/*!40000 ALTER TABLE `refreshtoken` DISABLE KEYS */;
+/*!40000 ALTER TABLE `refreshtoken` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `taikhoan`
 --
 
@@ -461,4 +486,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-06-17  8:06:55
+-- Dump completed on 2020-06-17 23:05:11
