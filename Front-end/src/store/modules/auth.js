@@ -2,7 +2,7 @@ import axios from "axios";
 var jwt = require('jsonwebtoken');
 
 const state = {
-  isAuthenticated: true,
+  isAuthenticated: false,
   user: null
 };
 
