@@ -7,31 +7,6 @@ const jwt = require('jsonwebtoken');
 const logger = require('log4js').getLogger();
 
 module.exports = {
-  login: async entity => {
-    // entity = {
-    //   username: 'kh1',
-    //   password: '123'
-    // }
-
-
-    sql = `select tk.*, kh.email, kh.hoTen
-            from taikhoannganhang tk left join 
-            khachhang kh on tk.idKhachHang = kh.id
-            where tk.username = '${entity.username}'`;
-
-    
-    const rows = await db.load(sql);
-    if (rows.length === 0)
-      return null;
-
-
-    const hashPwd = rows[0].password;
-    if (bcrypt.compareSync(entity.password, hashPwd)) {
-      return rows[0];
-    }
-
-    return null;
-  },
   loginAdmin: async entity => {
     // entity = {
     //   username: 'kh1',
@@ -39,7 +14,7 @@ module.exports = {
     // }
 
 
-    sql = `select nv.*, vt.moTa from nhanvien nv inner join vaitro vt on nv.idVaiTro = vt.id 
+    sql = `select nv.*, vt.tenVaiTro from taikhoan nv inner join vaitro vt on nv.idVaiTro = vt.idVaiTro 
             where nv.username = '${entity.username}'`;
 
     
@@ -58,15 +33,14 @@ module.exports = {
   
   //RefreshToken
 
-  updateRefreshToken: async (userId, refreshToken, isNhanVien) => {
+  updateRefreshToken: async (userId, refreshToken) => {
     var rdt = moment().format('YYYY-MM-DD HH:mm:ss');
     var resultInsert = 0;
     const results = await db.del({ userId }, 'refreshtoken');
     const entity = {
       userId: userId,
       refreshToken: refreshToken,
-      date: rdt,
-      isNhanVien: isNhanVien  //nếu userId là của NV thì đánh true
+      date: rdt
     };
     resultInsert = await db.add(entity, 'refreshToken');
     
@@ -75,11 +49,16 @@ module.exports = {
   },
 
   loadTaiKhoanById: id => {
-    const sql = `select tk.*, kh.email, kh.hoTen
-                  from taikhoannganhang tk inner join 
-                  khachhang kh on tk.idKhachHang = kh.id
-                  where tk.id = '${id}'`;
+    const sql = `select tk.tenNV
+                  from taikhoan tk
+                  where tk.idTaiKhoan = '${id}'`;
     return db.load(sql);                         
+  },
+
+  loadUserAndRoleByIdUser: id => {
+    const sql = `select tk.*, vt.tenVaiTro from taikhoan tk inner join vaitro vt on tk.idVaiTro = vt.idVaiTro 
+                  where tk.idTaiKhoan = '${id}'`;
+    return db.load(sql);
   },
   
   deleteRefreshToken: userId => db.del({ userId: userId }, 'refreshtoken'),
@@ -107,7 +86,7 @@ module.exports = {
   // return 0: success
   //
   patchPassword: async (id, entity) => {
-    sql = `select password from taikhoannganhang where id = '${id}'`;
+    sql = `select password from taikhoan where idTaiKhoan = '${id}'`;
 
     const rows = await db.load(sql);
     if(rows.length > 0)
@@ -118,7 +97,7 @@ module.exports = {
           const hash = bcrypt.hashSync(entity.password, 8);
           entity.password = hash;
           delete entity.passwordOld;
-          result = db.patch(entity, { id: id }, 'taikhoannganhang')
+          result = db.patch(entity, { id: id }, 'taikhoan')
           logger.info('userId: '+ id + ' has updated password affected rows ' + result.changedRows)
           return otps.STATUS_PASSWORD.SUCCESS;
         }
@@ -151,7 +130,7 @@ module.exports = {
   forgotPassword: (username, entity) => {
     const hash = bcrypt.hashSync(entity.password, 8);
     entity.password = hash;
-    result = db.patch(entity, { username: username }, 'taikhoannganhang')
+    result = db.patch(entity, { username: username }, 'taikhoan')
     return result;
   }
 

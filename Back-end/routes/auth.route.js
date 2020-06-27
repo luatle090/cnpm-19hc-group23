@@ -2,7 +2,6 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const rndToken = require('rand-token');
 const authModel = require('../models/auth.model');
-const nhanVienModel = require('../models/nhanvien.model');
 const opts = require('../utils/opts');
 const request = require('request');
 const router = express.Router();
@@ -59,7 +58,7 @@ router.post('/admin', async (req, res) => {
     
     const token = generateAccessToken(ret);
     const rfToken = rndToken.generate(opts.REFRESH_TOKEN.SIZE);
-    const result = await authModel.updateRefreshToken(ret.id, rfToken, false);
+    const result = await authModel.updateRefreshToken(ret.idTaiKhoan, rfToken);
     if(result.insertId > 0){
       res.status(201).json({
         // authenticated: true,
@@ -82,11 +81,11 @@ router.post('/admin', async (req, res) => {
 
 function generateAccessToken(ret){
   const payload = {
-      userId: ret.id,
+      userId: ret.idTaiKhoan,
       username: ret.username,
-      hoTen: ret.hoTen,
+      hoTen: ret.tenNV,
       vaiTro: ret.idVaiTro,
-      vaiTroMT: ret.moTa
+      vaiTroMT: ret.tenVaiTro
   }
   const token = jwt.sign(payload, opts.ACCESS_TOKEN.SECRET_KEY, {
     expiresIn:  opts.ACCESS_TOKEN.LIFETIME // 10 mins
@@ -117,7 +116,7 @@ router.post('/renew-token', async (req, res) => {
     }
     
     //sau đó lấy userID để truy vấn thông tin và cấp lại access token
-    var rowTaiKhoan = await nhanVienModel.loadById(rows[0].userId);
+    var rowTaiKhoan = await authModel.loadUserAndRoleByIdUser(rows[0].userId);
       
     if(rowTaiKhoan.length === 0){
       return res.status(204).end();

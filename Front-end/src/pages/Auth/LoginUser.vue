@@ -24,7 +24,6 @@
 
       <div class="actions md-layout md-alignment-center-space-between">
         
-        <b-link to="/forgot">Quên mật khẩu</b-link>
         <md-button :disabled="status" class="md-raised md-primary" type="submit">Log in</md-button>
       </div>
       </form>
@@ -70,7 +69,7 @@ export default {
           // console.log(recaptchaToken);
       self.$refs.recaptcha.reset();
       axios
-        .post("/auth", {
+        .post("/auth/admin", {
           username: this.username,
           password: this.password,
           recaptchaToken: recaptchaToken

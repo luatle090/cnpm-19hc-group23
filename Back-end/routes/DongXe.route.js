@@ -29,6 +29,26 @@ router.get('/:id', async (req, res) => {
   }
 })
 
+router.get('/hangxe/:id', async (req, res) => {
+  if (isNaN(req.params.id)) {
+    throw createError(400, 'Invalid id.');
+  }
+
+  const id = req.params.id || -1;
+  try {
+    const rows = await dongXeModel.loadByIdHangXe(id);
+    if (rows.length === 0) {
+      res.status(204).end();
+    } else {
+      res.json(rows);
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500);
+    res.end('View error log on console.');
+  }
+})
+
 router.post('/', async (req, res) => {
   const results = await dongXeModel.add(req.body);
   const ret = {

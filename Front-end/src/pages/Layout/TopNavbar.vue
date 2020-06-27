@@ -86,7 +86,7 @@ export default {
         this.signOut(localStorage.accessToken);
         this.$router.push('/login');
       }).catch(err => {
-        console.log(err);
+        this.$router.push('/login');
       });
     }
   }
