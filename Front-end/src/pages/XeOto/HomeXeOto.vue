@@ -2,7 +2,7 @@
     <div class="content">
         <div class="md-layout">
             <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" >
-                <b-alert v-model="show" variant="success"  dismissible>{{ message }}</b-alert>
+                <b-alert v-model="showMS" :variant="erro ? 'danger' : 'success'"  dismissible>{{ message }}</b-alert>
                 <md-card>
                     <md-card-header data-background-color="green">
                         <h4 class="title">{{ title }}</h4>
@@ -61,7 +61,7 @@
 
                          <div class="md-layout-item md-small-size-100 md-size-100 text-right">
                             <md-button class="btn-search md-raised md-success" @click="getXeOto">Tìm kiếm</md-button>
-                            <md-button type="button" to="/taoxeoto" class="md-raised md-success btn-size">
+                            <md-button type="button" to="/xeoto/taoxeoto" class="md-raised md-success btn-size">
                                 Thêm xe thuê
                             </md-button>
                         </div>
@@ -91,7 +91,7 @@
                                         <md-icon>info</md-icon>
                                         </div></div>
                                     </button>
-                                   <button title="Cập nhật" type="button" @click="updateXeOto(row.item.id)" 
+                                   <button title="Cập nhật" type="button" @click="updateXeOto(row.item.idXeOto)" 
                                         class="md-button md-just-icon md-theme-default md-info md-simple"
                                     >
                                         <div class="md-ripple"> <div class="md-button-content">
@@ -119,8 +119,11 @@
                                     aria-controls="my-table"
                                 ></b-pagination>
                             </div>
+                            <div style="display: none;" :key="item.idXeOto" v-for="item in dsXeOto">
+                                <input type="hidden" v-model.lazy="item.giaThue" v-money="money" /> 
+                                <input type="hidden" v-model.lazy="item.tienDatCoc" v-money="money" /> 
+                            </div>
                         </div>
-                        <!-- <simple-table table-header-color="green"></simple-table> -->
                     </md-card-content>
                 </md-card>
             </div>
@@ -131,11 +134,20 @@
 <script>
 import axios from "axios";
 import { VMoney } from "v-money";
-import { mapActions, mapGetters } from "vuex";
-import EventSource from "eventsource";
+import { mapActions } from "vuex";
 
 export default {
-    props: ['showMS'],
+    props: {
+        message: String,
+        showMS: {
+            default: false,
+            type: Boolean
+        },
+        erro: {
+            default: false,
+            type: Boolean
+        }
+    },
     data() {
         return {
             title: 'Quản lý xe ô tô',
@@ -145,7 +157,6 @@ export default {
             loai: 0,
             tinhTrang: '',
             isBusy: false,
-            message: '',
             show: false,
             filter: {
                 soHieuXe: "",
@@ -161,7 +172,7 @@ export default {
                 { key: 'tenDongXe', label: 'Dòng xe' },
                 { key: 'giaThue', label: 'Giá cho thuê' },
                 { key: 'phanTramDatCoc', label: '% Đặt cọc' },
-                { key: 'datCoc', label: 'Tiền đặt cọc' },
+                { key: 'tienDatCoc', label: 'Tiền đặt cọc' },
                 { key: 'actions', label: 'Thao tác' }
             ],
 
@@ -178,10 +189,6 @@ export default {
         };
     },
 
-    watch: {
-        
-    },
-
     mounted() {
         this.getXeOto();
         this.getHangXe();
@@ -192,8 +199,9 @@ export default {
     methods: {
         ...mapActions(["getToken"]),
 
-        updateXeOto(){
-            this.$router.replace({name:'Tạo Ô tô', params:{update : true}});
+        updateXeOto(id){
+            //this.$router.push({name:'Cập nhật Ô tô', params:{id,update : true}});
+            this.$router.push({name:'Cập nhật Ô tô', params:{id}});
         },
 
         async getXeOto(){
@@ -284,7 +292,10 @@ export default {
                 console.log(err);
             })
         }
-    }
+    },
+    directives: {
+        money: VMoney
+  },
 };
 </script>
 <style scoped>

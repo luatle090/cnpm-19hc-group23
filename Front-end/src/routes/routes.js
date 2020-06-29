@@ -16,42 +16,42 @@ const routes = [
         name: "Dashboard",
         component: Dashboard
       },
-      {
-        path: "taikhoannganhang",
-        name: "Tài Khoản Ngân Hàng",
-        component: () => import("./../pages/customer/taikhoannganhang")
-      },
+      // {
+      //   path: "taikhoannganhang",
+      //   name: "Tài Khoản Ngân Hàng",
+      //   component: () => import("./../pages/customer/taikhoannganhang")
+      // },
      
-      {
-        path: "lichsuchuyenkhoan",
-        name: "Lịch Sử Chuyển Khoản",
-        component: () => import("../pages/customer/lichSuChuyenKhoan")
-      },
-      {
-        path: "lichsunhantien",
-        name: "Lịch Sử Nhận Tiền",
-        component: () => import("../pages/customer/lichSuNhanTien")
-      },
-      {
-        path: "chuyenkhoannoibo",
-        name: "Chuyển khoản",
-        component: () => import("../pages/chuyenKhoan/chuyenKhoanNoiBo")
-      },
-      {
-        path: "xacnhanchuyenkhoan",
-        name: "Xác nhận Chuyển khoản",
-        component: () => import("../pages/chuyenKhoan/xacNhanChuyenKhoanNoiBo")
-      },
-      {
-        path: "cklnh",
-        name: "Chuyển khoản liên ngân hàng",
-        component: () => import("../pages/chuyenKhoan/chuyenKhoanLienNganHang")
-      },
-      {
-        path: "xacnhancklnh",
-        name: "Xác nhận chuyển khoản liên ngân hàng",
-        component: () => import("../pages/chuyenKhoan/xacNhanChuyenKhoanLienNganHang")
-      },
+      // {
+      //   path: "lichsuchuyenkhoan",
+      //   name: "Lịch Sử Chuyển Khoản",
+      //   component: () => import("../pages/customer/lichSuChuyenKhoan")
+      // },
+      // {
+      //   path: "lichsunhantien",
+      //   name: "Lịch Sử Nhận Tiền",
+      //   component: () => import("../pages/customer/lichSuNhanTien")
+      // },
+      // {
+      //   path: "chuyenkhoannoibo",
+      //   name: "Chuyển khoản",
+      //   component: () => import("../pages/chuyenKhoan/chuyenKhoanNoiBo")
+      // },
+      // {
+      //   path: "xacnhanchuyenkhoan",
+      //   name: "Xác nhận Chuyển khoản",
+      //   component: () => import("../pages/chuyenKhoan/xacNhanChuyenKhoanNoiBo")
+      // },
+      // {
+      //   path: "cklnh",
+      //   name: "Chuyển khoản liên ngân hàng",
+      //   component: () => import("../pages/chuyenKhoan/chuyenKhoanLienNganHang")
+      // },
+      // {
+      //   path: "xacnhancklnh",
+      //   name: "Xác nhận chuyển khoản liên ngân hàng",
+      //   component: () => import("../pages/chuyenKhoan/xacNhanChuyenKhoanLienNganHang")
+      // },
       {
         path: "hopdong",
         name: "Hợp đồng",
@@ -88,14 +88,29 @@ const routes = [
       {
         path: "xeoto",
         name: "Xe Ô tô",
-        component: () => import("../pages/XeOto/HomeXeOto"),
+        component: () => import("../pages/XeOto/ContentXeOto"),
+        redirect: "/xeoto/",
+        children:[
+          {
+            path: "/",
+            name: "Xe Ô tô",
+            component: () => import("../pages/XeOto/HomeXeOto"),
+            props: true
+          },
+          {
+            path: "taoxeoto",
+            name: "Tạo Ô tô",
+            component: () => import("../pages/XeOto/CreateXeOto")
+          },
+          {
+            path: "capnhatxe/:id",
+            name: "Cập nhật Ô tô",
+            component: () => import("../pages/XeOto/CreateXeOto"),
+            props: { update: true }
+          },
+        ]
       },
-      {
-        path: "taoxeoto",
-        name: "Tạo Ô tô",
-        component: () => import("../pages/XeOto/CreateXeOto"),
-        props: true
-      },
+      
       {
         path: "xekhachtra",
         name: "Kiểm tra xe khách trả",
@@ -119,11 +134,11 @@ const routes = [
         name: "Báo cáo",
         component: () => import("../pages/BaoCao/BaoCaoDoanhSo"),
       },
-      {
-        path: "thietlapnguoinhan",
-        name: "Thiết lập người nhận",
-        component: () => import("../pages/customer/thietlapnguoinhan")
-      }
+      // {
+      //   path: "thietlapnguoinhan",
+      //   name: "Thiết lập người nhận",
+      //   component: () => import("../pages/customer/thietlapnguoinhan")
+      // }
     ],
   },
   {
