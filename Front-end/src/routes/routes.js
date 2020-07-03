@@ -55,14 +55,28 @@ const routes = [
       {
         path: "hopdong",
         name: "Hợp đồng",
-        component: () => import("../pages/HopDong/HomeHopDong"),
-        props: true
-      },
-      {
-        path: "taohopdong",
-        name: "Tạo Hợp đồng",
-        component: () => import("../pages/HopDong/CreateHopDong"),
-        props: true
+        component: () => import("../pages/HopDong/Content"),
+        redirect: "/hopdong/",
+        children:[
+          {
+            path: "/",
+            name: "Hợp đồng",
+            component: () => import("../pages/HopDong/HomeHopDong"),
+            props: true,
+          },
+          {
+            path: "taohopdong",
+            name: "Tạo Hợp đồng",
+            component: () => import("../pages/HopDong/CreateHopDong"),
+            props: true
+          },
+          {
+            path: "capnhat/:id",
+            name: "Cập nhật hợp đồng",
+            component: () => import("../pages/HopDong/CreateHopDong"),
+            props: { update: true }
+          },
+        ]
       },
       {
         path: "thanhtoan",

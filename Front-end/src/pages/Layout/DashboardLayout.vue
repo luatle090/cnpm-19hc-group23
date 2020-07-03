@@ -90,6 +90,7 @@ import TopNavbar from "./TopNavbar.vue";
 import ContentFooter from "./ContentFooter.vue";
 import DashboardContent from "./Content.vue";
 import MobileMenu from "@/pages/Layout/MobileMenu.vue";
+import jwt from "jsonwebtoken";
 
 export default {
   components: {
@@ -104,6 +105,23 @@ export default {
       nvThueXe: true,
       nvBaoDuong: true, 
     }
+  },
+  mounted() {
+   this.role();
+  },
+  methods: {
+    role() {
+      const token = jwt.decode(localStorage.getItem("accessToken"));
+      if(token.vaiTro === 1){
+        this.quanLy = true;
+      }
+      else if (token.vaiTro === 2){
+        this.nvThueXe = true;
+      }
+      else{
+        this.nvBaoDuong = true;
+      }
+    },
   }
 };
 </script>

@@ -2,7 +2,6 @@
 <div class="content">
     <div class="md-layout">
       <div class="md-layout-item md-medium-size-100 md-size-100">
-        <b-alert v-model="show" :variant="erro ? 'danger' : 'success'"  dismissible>{{ message }}</b-alert>
         <form v-on:submit.prevent="taoHopDong">
           <md-card>
             <md-card-header data-background-color="green">
@@ -13,41 +12,41 @@
                 <div v-show="update" class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
                     <label>Mã hợp đồng</label>
-                    <md-input required disabled v-model.trim="maHD" type="text" ></md-input>
+                    <md-input required disabled v-model.trim="hopDong.maHopDong" type="text" ></md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
                     <label>Họ tên</label>
-                    <md-input v-bind:value="hoTen" required type="text" ></md-input>
+                    <md-input v-bind:value="hopDong.hoTen" required type="text" ></md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
                     <label>CMND</label>
-                    <md-input required v-model.number="CMND" type="text"> </md-input>
+                    <md-input required v-model.number="hopDong.CMND" type="text"> </md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
                     <label>Địa chỉ</label>
-                    <md-input v-model.trim="diaChi" required type="text" ></md-input>
+                    <md-input v-model.trim="hopDong.diaChi" required type="text" ></md-input>
                   </md-field>
                 </div>
                   <div class="md-layout-item md-small-size-100 md-size-100">
-                    <md-datepicker v-model="ngayThueXe" required md-immediately>
+                    <md-datepicker v-model="hopDong.ngayThueXe" required md-immediately>
                       <label>Ngày thuê xe</label>
                     </md-datepicker>    
                 </div>
                   <div class="md-layout-item md-small-size-100 md-size-100">
-                    <md-datepicker v-model="ngayTraXe" required md-immediately>
+                    <md-datepicker v-model="hopDong.ngayTraXe" required md-immediately>
                       <label>Ngày trả xe</label>
                     </md-datepicker>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
                     <label>Số hiệu xe</label>
-                    <md-input v-model.trim="soHieuXe" required type="text" ></md-input>
+                    <md-input v-model.trim="hopDong.soHieuXe" required type="text" ></md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100 text-right">
@@ -79,25 +78,28 @@ export default {
     return {
       erro: false,
       show: false,
-      maHD: "",
-      hoTen: "Lê Hoàng Luật",
-      CMND: "025423231",
-      diaChi: "227 Nguyễn Văn Cừ, Q.5",
-      ngayTraXe: "22/06/2020",
-      ngayThueXe: "14/06/2020",
-      soHieuXe: "Innova01",
-      message: "",
+      hopDong: {
+        maHopDong: "",
+        hoTen: "",
+        CMND: "",
+        diaChi: "",
+        ngayTraXe: null,
+        ngayThueXe: null,
+        soHieuXe: "",
+      },
       title: "Tạo hợp đồng"
     };
   },
 
- mounted() {
+  mounted() {
     if(this.update === true){
-      return this.updateHopDong();
+      this.getHopDongById(this.$route.params.id);
     }
   },
 
   methods: {
+    ...mapActions(["getToken"]),
+
     taoHopDong(){
       this.show = true;
       if(this.update === true){
@@ -112,7 +114,66 @@ export default {
     updateHopDong(){
       this.maHD = "HD0001";
       this.title = "Cập nhật hợp đồng";
+    },
+
+    async getHopDongById(id){
+      this.title = "Cập nhật xe ô tô";
+      const accessToken = await this.getToken();
+      axios.get(`/hopdong/${id}`, {
+        headers: {
+          "x-access-token": accessToken
+        }
+      }).then(res => {
+        this.hopDong = res.data;
+      }).catch(err => {
+        console.log(err);
+      });
+    },
+
+    async themMoi(){
+      const accessToken = await this.getToken();
+      const xe = this.xe;
+      delete xe.idXeOto;
+      axios({
+        method: 'post',
+        url: '/xeoto',
+        headers: {
+          "x-access-token": accessToken
+        },
+        data: xe,
+      }).then(res => {
+        if(res.status === 201){
+          const message = "Thêm mới xe ô tô thành công";
+          this.$router.push({ name: 'Xe Ô tô', params: { message: message, showMS: true } })
+        }
+      }).catch(err => {
+        const message = "Thêm mới xe ô tô bị lỗi. Vui lòng liên hệ quản trị viên";
+        this.$router.push({ name: 'Xe Ô tô', params: { message: message, showMS: true, erro: true } })
+      });
+    },
+
+    async capNhat(){
+      const accessToken = await this.getToken();
+      const xe = this.xe;
+      delete xe.tienDatCoc;
+      axios({
+        method: 'patch',
+        url: `/xeoto/${this.xe.idXeOto}`,
+        headers: {
+          "x-access-token": accessToken
+        },
+        data: xe
+      }).then(res => {
+        if(res.status === 200){
+          const message = "Cập nhật xe ô tô thành công";
+          this.$router.push({ name: 'Xe Ô tô', params: { message: message, showMS: true } })
+        }
+      }).catch(err => {
+        const message = "Cập nhật xe ô tô bị lỗi. Vui lòng liên hệ quản trị viên";
+        this.$router.push({ name: 'Xe Ô tô', params: { message: message, showMS: true, erro: true } })
+      });
     }
+
   }
 
   // methods: {

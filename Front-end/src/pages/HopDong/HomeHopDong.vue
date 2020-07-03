@@ -2,7 +2,7 @@
     <div class="content">
         <div class="md-layout">
             <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" >
-                <b-alert v-model="show" variant="success"  dismissible>{{ message }}</b-alert>
+                <b-alert v-model="showMS" :variant="erro ? 'danger' : 'success'" dismissible>{{ message }}</b-alert>
                 <md-card>
                     <md-card-header data-background-color="green">
                         <h4 class="title">{{ title }}</h4>
@@ -12,19 +12,12 @@
                             <div class="md-layout-item md-small-size-100 md-size-30">
                                 <md-field>
                                     <label>Mã hợp đồng</label>
-                                    <md-input v-model="filter.maHD"></md-input>
-                                </md-field>
-                            </div>
-                             <div class="md-layout-item md-small-size-100 md-size-30">
-                                <md-field>
-                                    <label>Tình trạng</label>
-                                    <md-input v-model="filter.tinhTrang"></md-input>
+                                    <md-input v-model="filter.maHopDong"></md-input>
                                 </md-field>
                             </div>
                             <div class="md-layout-item md-small-size-100 md-size-30">
                                 <md-datepicker v-model="filter.ngayThueXe" required md-immediately>
                                     <label>Ngày thuê xe</label>
-                                    <md-input v-model="filter.maHD"></md-input>
                                 </md-datepicker>
                             </div>
                             <div class="md-layout-item md-small-size-100 md-size-30">
@@ -32,16 +25,22 @@
                                     <label>Ngày trả xe</label>
                                 </md-datepicker>
                             </div>
+                            <div class="md-layout-item md-small-size-100 md-size-30">
+                                <md-field>
+                                    <label>Tình trạng</label>
+                                    <md-input v-model="filter.tinhTrang"></md-input>
+                                </md-field>
+                            </div>
                         </div>
 
                          <div class="md-layout-item md-small-size-100 md-size-100 text-right">
-                             <md-button class="btn-search md-raised md-success">Tìm kiếm</md-button>
-                            <md-button type="button" to="/taohopdong" class="md-raised md-success btn-size">
+                            <md-button class="btn-search md-raised md-success" @click="getHopDong">Tìm kiếm</md-button>
+                            <md-button type="button" to="/hopdong/taohopdong" class="md-raised md-success btn-size">
                                 Tạo hợp đồng
                             </md-button>
                         </div>
                         <div>
-                            <b-table id="my-table" striped hover 
+                            <b-table id="my-table" striped hover show-empty
                                 :items="dsHopDong"
                                 :fields="headers"
                                 :per-page="perPage"
@@ -54,6 +53,9 @@
                                 <strong>Loading...</strong>
                                 </div>
                             </template>
+                            <template v-slot:empty>
+                                <h4>Không có dữ liệu</h4>
+                            </template>
                             <template v-slot:cell(actions)="row">
                                 <div class="md-table-cell-container">
                                     <button title="Chi tiết" type="button" @click="detailedNhacNo(row.item.id)" 
@@ -63,7 +65,7 @@
                                         <md-icon>info</md-icon>
                                         </div></div>
                                     </button>
-                                    <button title="Cập nhật" v-show="row.item.tinhTrang == 'Đang thuê'" type="button" @click="updateHopDong(row.item.id)" 
+                                    <button title="Cập nhật" v-show="row.item.tinhTrang == 'Đang thuê'" type="button" @click="updateHopDong(row.item.idHopDong)" 
                                         class="md-button md-just-icon md-theme-default md-info md-simple"
                                     >
                                         <div class="md-ripple"> <div class="md-button-content">
@@ -101,7 +103,7 @@
                                     v-model="currentPage"
                                     :total-rows="totalRows"
                                     :per-page="perPage"
-                                    @input="getNhacNo"
+                                    @input="getHopDong"
                                     aria-controls="my-table"
                                 ></b-pagination>
                             </div>
@@ -121,29 +123,39 @@ import { mapActions, mapGetters, mapMutations } from "vuex";
 import EventSource from "eventsource";
 
 export default {
-    props: ['showMS'],
+    props: {
+        showMS: {
+            default: false,
+            type: Boolean
+        },
+        erro: {
+            default: false,
+            type: Boolean
+        },
+        message: String
+    },
     data() {
         return {
             title: 'Hợp đồng',
             currentPage: 1,
             perPage: 10,
-            totalRows: 21,
+            totalRows: 0,
             loai: 0,
             tinhTrang: '',
             isBusy: false,
-            show: false,
             filter: {
-                maHD: "",
+                maHopDong: "",
                 ngayThueXe: null,
-                ngayThueXe: null,
+                ngayTraXe: null,
                 tinhTrang: "",
             },
 
-            message: 'Tạo nhắc nợ thành công',
             headers: [
-                { key: 'maHD', label: 'Mã hợp đồng' },
+                { key: 'maHopDong', label: 'Mã hợp đồng' },
                 { key: 'hoTen', label: 'Họ tên' },
                 { key: 'soHieuXe', label: 'Số hiệu xe' },
+                { key: 'tenHangXe', label: 'Hãng xe' },
+                { key: 'tenDongXe', label: 'Dòng xe' },
                 { key: 'ngayThueXe', label: 'Ngày thuê xe' },
                 { key: 'ngayTraXe', label: 'Ngày trả xe' },
                 { key: 'tinhTrang', label: 'Tình trạng' },
@@ -157,30 +169,70 @@ export default {
             },
 
             dsHopDong: [
-                {maHD: "HD0001", hoTen: "Lê Hoàng Luật", soHieuXe: "Toyota01", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Đang thuê"},
-                {maHD: "HD0002", hoTen: "Nguyễn Ngọc Châu", soHieuXe: "Huyndai02", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Đang thuê"},
-                {maHD: "HD0003", hoTen: "Nguyễn Mỹ Linh", soHieuXe: "Inova01", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Đang thuê"},
-                {maHD: "HD0104", hoTen: "Nguyễn Minh Quân",soHieuXe: "Inova02", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Hoàn tất"},
-                {maHD: "HD0105", hoTen: "Trần Anh Tuấn", soHieuXe: "Kia01", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Hoàn tất"},
-                {maHD: "HD0200", hoTen: "Lê Mỹ Linh", soHieuXe: "Kia03", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Hoàn tất"},
-                {maHD: "HD0201", hoTen: "Nguyễn Anh Thư", soHieuXe: "Nissan02", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Đang thuê"},
-                {maHD: "HD0211", hoTen: "Nguyễn Như Ngân",soHieuXe: "Nissan01", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Đang thuê"},
-                {maHD: "HD0215", hoTen: "Trần Tuấn Anh", soHieuXe: "Toyota02",ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Đang thuê"},
-                {maHD: "HD0301", hoTen: "Lê Khả Như", soHieuXe: "Toyota03",ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Hoàn tất"},
-                {maHD: "HD0302", hoTen: "Nguyễn Minh Quân", soHieuXe: "Toyota05", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Hoàn tất"},
-            ]
+            //     {idHopDong: 1, maHD: "HD0001", hoTen: "Lê Hoàng Luật", soHieuXe: "Toyota01", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Đang thuê"},
+            //     {maHD: "HD0002", hoTen: "Nguyễn Ngọc Châu", soHieuXe: "Huyndai02", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Đang thuê"},
+            //     {maHD: "HD0003", hoTen: "Nguyễn Mỹ Linh", soHieuXe: "Inova01", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Đang thuê"},
+            //     {maHD: "HD0104", hoTen: "Nguyễn Minh Quân",soHieuXe: "Inova02", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Hoàn tất"},
+            //     {maHD: "HD0105", hoTen: "Trần Anh Tuấn", soHieuXe: "Kia01", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Hoàn tất"},
+            //     {maHD: "HD0200", hoTen: "Lê Mỹ Linh", soHieuXe: "Kia03", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Hoàn tất"},
+            //     {maHD: "HD0201", hoTen: "Nguyễn Anh Thư", soHieuXe: "Nissan02", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Đang thuê"},
+            //     {maHD: "HD0211", hoTen: "Nguyễn Như Ngân",soHieuXe: "Nissan01", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Đang thuê"},
+            //     {maHD: "HD0215", hoTen: "Trần Tuấn Anh", soHieuXe: "Toyota02",ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Đang thuê"},
+            //     {maHD: "HD0301", hoTen: "Lê Khả Như", soHieuXe: "Toyota03",ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Hoàn tất"},
+            //     {maHD: "HD0302", hoTen: "Nguyễn Minh Quân", soHieuXe: "Toyota05", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Hoàn tất"},
+             ]
         };
     },
 
+    mounted(){
+        this.getHopDong();
+    },
+
     methods: {
-        updateHopDong(){
-            this.$router.replace({name:'Tạo Hợp đồng', params:{update : true}});
+        ...mapActions(["getToken"]),
+
+        updateHopDong(id){
+            console.log(id);
+            this.$router.push({name:'Cập nhật hợp đồng', params:{id}});
         },
 
         thanhToanHopDong(){
             this.$router.replace({path:'thanhtoan'});
-        }
-    }
+        },
+
+        async getHopDong(){
+            const accessToken = await this.getToken();
+            let properties = {
+                limit: this.perPage,
+                offset: this.currentPage - 1,
+            };
+            if("" !== this.filter.maHopDong){
+                properties.maHopDong = this.filter.maHopDong;
+            }
+            if("" !== this.filter.tinhTrang){
+                properties.tinhTrangHopDong = this.filter.tinhTrangHopDong;
+            }
+            if(this.filter.ngayThueXe){
+                properties.ngayThueXe = Number(this.filter.ngayThueXe);
+            }
+            if(this.filter.ngayTraXe){
+                properties.ngayTraXe = Number(this.filter.ngayTraXe);
+            }
+
+
+            return axios.get('/hopdong', {
+                headers: {
+                    "x-access-token": accessToken
+                },
+                params: properties
+            }).then(res => {
+                this.dsHopDong = res.data.listResult;
+                this.totalRows =res.data.totalItems;
+            }).catch( err => {
+                console.log(err);
+            })
+        },
+    },
     
     // mounted() {
     //     console.log(this.showMS);
