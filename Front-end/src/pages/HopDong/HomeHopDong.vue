@@ -192,7 +192,6 @@ export default {
         ...mapActions(["getToken"]),
 
         updateHopDong(id){
-            console.log(id);
             this.$router.push({name:'Cập nhật hợp đồng', params:{id}});
         },
 

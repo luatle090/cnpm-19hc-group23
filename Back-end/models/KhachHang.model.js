@@ -2,7 +2,8 @@ const db = require('../utils/db');
 
 module.exports = {
   all: () => {
-    const sql = 'select * from khachhang';
+    const sql = `select CMND as CMND, idKhachHang, hoTen, diaChi, SDT 
+                  from khachhang`;
     return db.load(sql);
   },
 

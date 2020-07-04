@@ -48,6 +48,27 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/allsohieuxe', async (req, res) => {
+  const row = await xeModel.getAllSoHieuXe();
+  if(row.length === 0){
+    res.status(204);
+  }
+  else{
+    res.json(row);
+  }
+}),
+
+router.get('/allsohieuxe/:sohieuxe', async (req, res) => {
+  const row = await xeModel.getAllSoHieuXe();
+  if(row.length === 0){
+    res.status(204);
+  }
+  else{
+    console.log(row[0]);
+    res.json(row);
+  }
+}),
+
 router.get('/:id', async (req, res) => {
   if (isNaN(req.params.id)) {
     throw createError(400, 'Invalid id.');

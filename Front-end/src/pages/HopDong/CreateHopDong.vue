@@ -2,7 +2,7 @@
 <div class="content">
     <div class="md-layout">
       <div class="md-layout-item md-medium-size-100 md-size-100">
-        <form v-on:submit.prevent="taoHopDong">
+        <form v-on:submit.prevent="submit">
           <md-card>
             <md-card-header data-background-color="green">
               <h4 class="title">{{ title }}</h4>
@@ -18,23 +18,25 @@
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
                     <label>Họ tên</label>
-                    <md-input v-bind:value="hopDong.hoTen" required type="text" ></md-input>
+                    <md-input v-model.trim="hoTen" disabled type="text" ></md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
-                  <md-field>
+                  <md-autocomplete required v-model.trim="hopDong.CMND" 
+                    :md-options="dsCMND"
+                    @md-changed='getInfoKH'
+                  >
                     <label>CMND</label>
-                    <md-input required v-model.number="hopDong.CMND" type="text"> </md-input>
-                  </md-field>
+                  </md-autocomplete>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
                     <label>Địa chỉ</label>
-                    <md-input v-model.trim="hopDong.diaChi" required type="text" ></md-input>
+                    <md-input v-model.trim="diaChi" disabled type="text" ></md-input>
                   </md-field>
                 </div>
                   <div class="md-layout-item md-small-size-100 md-size-100">
-                    <md-datepicker v-model="hopDong.ngayThueXe" required md-immediately>
+                    <md-datepicker v-model="hopDong.ngayThueXe"  required md-immediately>
                       <label>Ngày thuê xe</label>
                     </md-datepicker>    
                 </div>
@@ -44,9 +46,39 @@
                     </md-datepicker>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
-                  <md-field>
+                  <md-autocomplete v-model.trim="hopDong.soHieuXe" 
+                    :md-options="dsSoHieuXe"
+                    @md-changed='getInfoXe'
+                    required
+                  >
                     <label>Số hiệu xe</label>
-                    <md-input v-model.trim="hopDong.soHieuXe" required type="text" ></md-input>
+                    <!-- <template slot="md-autocomplete-item" slot-scope="{ item }">{{ item.soHieuXe }}</template> -->
+                  </md-autocomplete>
+                </div>
+                 <div class="md-layout-item md-small-size-100 md-size-100">
+                  <md-field>
+                    <label>Giá thuê</label>
+                    <span class="md-prefix">$</span>
+                    <md-input v-model="giaThue" disabled type="text" ></md-input>
+                  </md-field>
+                </div>
+                 <div class="md-layout-item md-small-size-100 md-size-100">
+                  <md-field>
+                    <label>Tiền đặt cọc</label>
+                    <span class="md-prefix">$</span>
+                    <md-input v-model="tienDatCoc" disabled type="text" ></md-input>
+                  </md-field>
+                </div>
+                <div class="md-layout-item md-small-size-100 md-size-100">
+                  <md-field>
+                    <label>Hãng xe</label>
+                    <md-input v-model.trim="tenHangXe" disabled type="text" ></md-input>
+                  </md-field>
+                </div>
+                <div class="md-layout-item md-small-size-100 md-size-100">
+                  <md-field>
+                    <label>Dòng xe</label>
+                    <md-input v-model.trim="tenDongXe" disabled type="text" ></md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100 text-right">
@@ -78,42 +110,47 @@ export default {
     return {
       erro: false,
       show: false,
+      hoTen: "",
+      diaChi: "",
+      tenHangXe: "",
+      tenDongXe: "",
+      giaThue: null,
+      tienDatCoc: null,
       hopDong: {
         maHopDong: "",
-        hoTen: "",
-        CMND: "",
-        diaChi: "",
+        CMND: "",     
         ngayTraXe: null,
-        ngayThueXe: null,
+        ngayThueXe: new Date(),
         soHieuXe: "",
+        idKhachHang: null,    
       },
+      mapSoHieuXe: null,
+      mapKhachHang: null,
+      dsSoHieuXe: [],
+      dsCMND: [],
+
       title: "Tạo hợp đồng"
     };
   },
 
-  mounted() {
+  async mounted() {
+    await this.getXeOto();
+    await this.getKhachHang();
     if(this.update === true){
       this.getHopDongById(this.$route.params.id);
-    }
+    }   
   },
 
   methods: {
-    ...mapActions(["getToken"]),
+    ...mapActions(["getToken", 'phanCachTien']),
 
-    taoHopDong(){
-      this.show = true;
+    submit(){
       if(this.update === true){
-        this.message = "Cập nhật hợp đồng thành công";
+        this.capNhat();
       }
       else{
-        this.maHD = "HD0001";
-        this.message = "Tạo hợp đồng thành công";
+        this.themMoi();
       }
-    },
-
-    updateHopDong(){
-      this.maHD = "HD0001";
-      this.title = "Cập nhật hợp đồng";
     },
 
     async getHopDongById(id){
@@ -125,134 +162,132 @@ export default {
         }
       }).then(res => {
         this.hopDong = res.data;
+        this.hopDong.ngayTraXe = new Date(this.hopDong.ngayTraXe);
+        this.hopDong.ngayThueXe = new Date(this.hopDong.ngayThueXe);
       }).catch(err => {
         console.log(err);
       });
     },
 
+    async getXeOto() {
+      const accessToken = await this.getToken();
+      axios.get(`/xeoto/allsohieuxe`, {
+        headers: {
+          "x-access-token": accessToken
+        }
+      }).then(res => {
+        const xeOtolist = res.data;
+        this.mapSoHieuXe = new Map();
+        for(const obj of xeOtolist){
+          this.mapSoHieuXe.set(obj.soHieuXe, obj);
+          this.dsSoHieuXe.push(obj.soHieuXe);
+        }
+      }).catch(err => {
+        console.log(err);
+      });
+    },
+
+    async getKhachHang() {
+      const accessToken = await this.getToken();
+      axios.get(`/khachhang`, {
+        headers: {
+          "x-access-token": accessToken
+        }
+      }).then(res => {
+        this.dsKhachHang = res.data;
+        this.mapKhachHang = new Map();
+        for(const obj of this.dsKhachHang){
+          this.mapKhachHang.set(obj.CMND, obj);
+          this.dsCMND.push(obj.CMND);    
+        }
+      }).catch(err => {
+        console.log(err);
+      });
+    },
+
+    getInfoKH(){
+      if(this.mapKhachHang.has(this.hopDong.CMND)){
+        const obj = this.mapKhachHang.get(this.hopDong.CMND);
+        this.hoTen = obj.hoTen;
+        this.diaChi = obj.diaChi;
+        this.hopDong.idKhachHang = obj.idKhachHang;
+      } else {
+        this.hoTen = "";
+        this.diaChi = "";
+      }
+    },
+
+    async getInfoXe() {
+      if(this.mapSoHieuXe.has(this.hopDong.soHieuXe)){
+        const obj = this.mapSoHieuXe.get(this.hopDong.soHieuXe);
+        this.giaThue = await this.phanCachTien(obj.giaThue);
+        this.tienDatCoc = await this.phanCachTien(obj.tienDatCoc);
+        this.tenHangXe = obj.tenHangXe;
+        this.tenDongXe = obj.tenDongXe;
+      } else {
+        this.tenHangXe = "";
+        this.tenDongXe = "";
+        this.giaThue = "";
+        this.tienDatCoc = "";
+      }
+    },
+
     async themMoi(){
       const accessToken = await this.getToken();
-      const xe = this.xe;
-      delete xe.idXeOto;
+      let hopDong = this.hopDong;
+      if(hopDong.ngayThueXe){
+        hopDong.ngayThueXe = Number(hopDong.ngayThueXe);
+      }
+      if(hopDong.ngayTraXe){
+        hopDong.ngayTraXe = Number(hopDong.ngayTraXe);
+      }
+      
       axios({
         method: 'post',
-        url: '/xeoto',
+        url: '/hopdong',
         headers: {
           "x-access-token": accessToken
         },
-        data: xe,
+        data: hopDong,
       }).then(res => {
         if(res.status === 201){
-          const message = "Thêm mới xe ô tô thành công";
-          this.$router.push({ name: 'Xe Ô tô', params: { message: message, showMS: true } })
+          const message = "Thêm mới hợp đồng thành công";
+          this.$router.push({ name: 'Hợp đồng', params: { message: message, showMS: true } })
         }
       }).catch(err => {
-        const message = "Thêm mới xe ô tô bị lỗi. Vui lòng liên hệ quản trị viên";
-        this.$router.push({ name: 'Xe Ô tô', params: { message: message, showMS: true, erro: true } })
+        const message = "Thêm mới hợp đồng bị lỗi. Vui lòng liên hệ quản trị viên";
+        this.$router.push({ name: 'Hợp đồng', params: { message: message, showMS: true, erro: true } })
       });
     },
 
     async capNhat(){
       const accessToken = await this.getToken();
-      const xe = this.xe;
-      delete xe.tienDatCoc;
+      let hopDong = this.hopDong;
+      if(hopDong.ngayThueXe){
+        hopDong.ngayThueXe = Number(hopDong.ngayThueXe);
+      }
+      if(hopDong.ngayTraXe){
+        hopDong.ngayTraXe = Number(hopDong.ngayTraXe);
+      }
+    
       axios({
         method: 'patch',
-        url: `/xeoto/${this.xe.idXeOto}`,
+        url: `/hopdong/${this.$route.params.id}`,
         headers: {
           "x-access-token": accessToken
         },
-        data: xe
+        data: hopDong
       }).then(res => {
         if(res.status === 200){
-          const message = "Cập nhật xe ô tô thành công";
-          this.$router.push({ name: 'Xe Ô tô', params: { message: message, showMS: true } })
+          const message = "Cập nhật hợp đồng thành công";
+          this.$router.push({ name: 'Hợp đồng', params: { message: message, showMS: true } })
         }
       }).catch(err => {
-        const message = "Cập nhật xe ô tô bị lỗi. Vui lòng liên hệ quản trị viên";
-        this.$router.push({ name: 'Xe Ô tô', params: { message: message, showMS: true, erro: true } })
+        const message = "Cập nhật hợp đồng bị lỗi. Vui lòng liên hệ quản trị viên";
+        this.$router.push({ name: 'Hợp đồng', params: { message: message, showMS: true, erro: true } })
       });
     }
-
-  }
-
-  // methods: {
-  //   ...mapActions(["getToken"]),
-
-  //   async truyVanSoTK(){
-  //       const accessToken = await this.getToken();
-  //       this.messageSoTK = "",
-  //       this.hoTen = "";
-  //       this.idTaiKhoanNo = "";
-  //       axios({
-  //           method: "get",
-  //           url: `/taikhoannganhang/${this.soTK}`,
-  //           headers:{
-  //               "x-access-token" : accessToken
-  //           },
-  //       }).then(res => {
-  //           if(res.status === 200){
-  //               this.hoTen = res.data.hoTen;
-  //               this.idTaiKhoanNo = res.data.id
-  //           }
-  //           else if(res.status === 204){
-  //               this.messageSoTK = "Không tồn tại tài khoản này"
-  //               this.soTK = "";
-  //           }
-  //       }).catch(erro => {
-  //           this.show = true;
-  //           this.message = "Có lỗi xảy ra";
-  //           this.erro = true;
-  //       })
-  //   },
-
-  //   async taoNhacNo(){
-  //     this.show = true;
-  //     const accessToken = await this.getToken();
-  //     const data = {
-  //         idTaiKhoanNo: this.idTaiKhoanNo,
-  //         tienNo: this.tienNo,
-  //         noiDung: this.noiDung
-  //     }
-
-  //     axios({
-  //       method: "post",
-  //       url: "/nhacno",
-  //       headers:{
-  //           "x-access-token" : accessToken
-  //       },
-  //       data: data
-  //     }).then(res => {
-  //       this.daChuyenXong = true;
-  //       if(res.status === 201){
-  //         this.show = false;
-  //         const showMS = true;
-  //         this.$router.replace({path:'nhacno', params:{showMS}});
-  //       }
-  //       else if (res.status === 204){
-  //         this.message = "Lỗi tạo nhắc nợ";
-  //         this.erro = true;
-  //       }
-  //     }).catch( err => {
-  //       if (err.response.status === 400){
-  //         this.message = "Nhập thiếu trường dữ liệu";
-  //         this.erro = true;
-  //       }
-  //       else if(err.response.status === 404){
-  //         this.message = "Không tìm thấy tài khoản nhắc nợ";
-  //         this.erro = true;
-  //       }
-  //       else if (err.response.status === 409){
-  //         this.message = "Người gửi và người nhận là một. Vui lòng chọn số tài khoản khác";
-  //         this.erro = true;
-  //       }
-  //       else{
-  //         this.message = "Có lỗi xảy ra";
-  //         this.erro = true;
-  //       }
-  //     });
-  //   }
-  // }
+  },
 };
 </script>
 <style scoped>

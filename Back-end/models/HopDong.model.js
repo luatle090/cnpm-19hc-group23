@@ -28,9 +28,8 @@ module.exports = {
                           hd.ngayTraXe is not null
                         )
                     and ('${entity.tinhTrangHopDong}' = '' or hd.tinhTrangHopDong = '${entity.tinhTrangHopDong}')
-                    order by xe.idXeOto
+                    order by hd.idHopDong
                     limit ${limit} offset ${offset}`;
-        console.log(sql);
         return db.load(sql);
     },
 
@@ -58,8 +57,8 @@ module.exports = {
     
   
     loadById: id => {
-      const sql = `select hd.idHopDong, hd.maHopDong, DATE_FORMAT(hd.ngayThue, "%d/%m/%Y") as ngayThueXe,
-                  DATE_FORMAT(hd.ngayTraXe, "%d/%m/%Y") as ngayTraXe , kh.hoTen, kh.CMND, kh.diaChi, kh.SDT,
+      const sql = `select hd.idHopDong, hd.maHopDong, hd.ngayThue as ngayThueXe,
+                  hd.ngayTraXe as ngayTraXe , kh.hoTen, kh.CMND, kh.diaChi, kh.SDT,
                   xe.soHieuXe, hx.tenHangXe, dx.tenDongXe
                   from hopdong hd
                   inner join khachHang kh on kh.idKhachHang = hd.idKhachHang
@@ -68,6 +67,19 @@ module.exports = {
                   inner join dongxe dx on xe.idDongXe = dx.idDongXe
                   inner join hangxe hx on dx.idHangXe = hx.idHangXe
                   where hd.idHopDong = ${id}`;
+      return db.load(sql);
+    },
+
+    phatSinhMaHopDong: () => {
+      const sql = `set @count = (
+                    select if((select count(idHopDong) from hopdong) = 0, cast(1 as signed), 
+                    (
+                      select Max(cast(right(maHopDong, 3) as SIGNED)) from hopdong) + 1
+                    )
+                  );
+                  set @id = concat('HD', right( concat('000', CONVERT(@count, char(11))), 3));
+                  select @id as maHopDong;`;
+
       return db.load(sql);
     },
   

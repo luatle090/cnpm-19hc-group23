@@ -9,6 +9,28 @@ module.exports = {
     return db.load(sql);
   },
 
+  getAllSoHieuXe: () => {
+    const sql = `select xe.soHieuXe as soHieuXe, xe.giaThue, xe.tienDatCoc, 
+                  hx.tenHangXe, dx.tenDongXe
+                from xeoto xe
+                inner join dongxe dx on xe.idDongXe = dx.idDongXe
+                inner join hangxe hx on dx.idHangXe = hx.idHangXe
+                inner join tinhtrang tt on xe.tinhTrangXe = tt.idTinhTrang
+                where xe.tinhTrangXe = 1 and xe.tinhTrangThue = 4`;
+    return db.load(sql);
+  },
+
+  getXeBySoHieuXe: (soHieuXe) => {
+    const sql = `select xe.idXeOto, xe.giaThue, xe.tienDatCoc, 
+                  hx.tenHangXe, dx.tenDongXe
+                from xeoto xe
+                inner join dongxe dx on xe.idDongXe = dx.idDongXe
+                inner join hangxe hx on dx.idHangXe = hx.idHangXe
+                inner join tinhtrang tt on xe.tinhTrangXe = tt.idTinhTrang
+                where xe.soHieuXe = '${soHieuXe}'`;
+    return db.load(sql);
+  },
+
   getlist: (entity, limit, offset) => {
     const sql = `select xe.idXeOto, xe.soHieuXe, xe.giaThue, xe.phanTramDatCoc,
                   xe.tienDatCoc, tt.moTa, lx.tenLoaiXe, dx.tenDongXe, hx.tenHangXe

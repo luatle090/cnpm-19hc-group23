@@ -4,6 +4,7 @@ import auth from "./modules/auth";
 import chuyenKhoan from "./modules/chuyenKhoan";
 import nhacNo from "./modules/nhacNo";
 import chuyenKhoanLienNH from './modules/chuyenKhoanLienNH';
+import lib from './modules/lib';
 
 Vue.use(Vuex);
 
@@ -12,6 +13,7 @@ export default new Vuex.Store({
         auth,
         chuyenKhoan,
         nhacNo,
-        chuyenKhoanLienNH
+        chuyenKhoanLienNH,
+        lib
     }
 })
