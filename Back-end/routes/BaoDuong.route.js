@@ -1,6 +1,9 @@
 const express = require('express');
 const createError = require('http-errors');
 const baoDuongModel = require('../models/BaoDuong.model');
+const chiTietModel = require('../models/ChiTietBaoDuong.model');
+const xeModel = require('../models/XeOto.model');
+const moment = require('moment');
 
 const router = express.Router();
 
@@ -80,22 +83,6 @@ router.get('/:id', async (req, res) => {
     res.status(204);
   }
   else{
-    // let entity = {
-    //     baoDuong : {
-    //         soHieuXe: rows[0].soHieuXe,
-    //         tinhTrangBaoDuong: rows[0].tinhTrangBaoDuong,
-    //     },
-    //     chiTiet: []
-    // }
-    // for(const row of rows){
-    //     const chiTiet = {
-    //         tenPhuTung: row.tenPhuTung,
-    //         idPhuTung: row.idPhuTung,
-    //         tinhTrang: row.tinhTrangPhuTung
-    //     }
-    //     entity.chiTiet.push(chiTiet);
-    // }
-
     let entity = {
         baoDuong : {
             soHieuXe: rows[0].soHieuXe,
@@ -127,6 +114,43 @@ router.get('/:id', async (req, res) => {
     }
     res.json(entity);
   }
+});
+
+/**
+ *  req.body.idXeOto;
+ *  req.body.ngayBaoDuong;
+ *  req.body.tinhTrang;
+ */
+router.post('/', async (req, res) => {
+    
+   
+    const ngay = new Date(+req.body.ngayBaoDuong);
+    req.body.ngayBaoDuong = moment(ngay).format('YYYY-MM-DD');
+
+    const entityLichSu = {
+        idXeOto: req.body.idXeOto,
+        ngayBaoDuong: req.body.ngayBaoDuong,
+        tinhTrang: req.body.tinhTrang
+    }
+    const chiTiet = req.body.chiTiet;
+    const results = await baoDuongModel.add(entityLichSu);
+    if(results.insertId > 0){
+        const entityXe = {
+            ngayBaoDuongLanCuoi: entityLichSu.ngayBaoDuong
+        }
+        await xeModel.patch(entityLichSu.idXeOto, entityXe);
+        for(let ct of chiTiet){
+            ct.idLichSu = results.insertId;
+            await chiTietModel.add(ct);
+        }
+        const ret = {
+            id: results.insertId,
+            ...req.body
+          }
+          res.status(201).json(ret);
+    } else {
+        res.status(204).end();
+    }
 });
 
 router.patch('/:id', async (req, res) => {
