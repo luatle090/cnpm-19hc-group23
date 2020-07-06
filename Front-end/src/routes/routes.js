@@ -97,9 +97,10 @@ const routes = [
             props: true,
           },
           {
-            path: "detailbaoduong",
+            path: "detailbaoduong/:id",
             name: "Xem chi tiết Bảo dưỡng",
             component: () => import("../pages/BaoDuong/DetailBaoDuong"),
+            props: true,
           },
           {
             path: "capnhat/:id",

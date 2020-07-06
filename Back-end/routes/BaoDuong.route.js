@@ -50,26 +50,84 @@ async function capNhatTinhTrang(){
    return result[1].affectedRows;
 }
 
+router.get('/ngaybaoduong/:id', async (req, res) => {
+    if(isNaN(req.params.id)){
+        throw createError(400, 'Invalid id.');
+    }
+
+    const id = req.params.id || -1;
+
+    const row = await baoDuongModel.loadNgayBaoDuongByIdXeOto(id);
+    if(row.length === 0){
+        res.status(204).end();
+    }
+    else {
+        res.status(200).json(row);
+    }
+});
+
 
 router.get('/:id', async (req, res) => {
   if (isNaN(req.params.id)) {
     throw createError(400, 'Invalid id.');
   }
+  let ngayBaoDuong = req.query.ngayBaoDuong || '';
 
   const id = req.params.id || -1;
 
-  const row = await xeModel.loadById(id);
-  if(row.length === 0){
+  const rows = await baoDuongModel.loadByIdXeOto(id, ngayBaoDuong);
+  if(rows.length === 0){
     res.status(204);
   }
   else{
-    delete row[0].hanBaoDuong;
-    delete row[0].ngayBaoDuongLanCuoi;
-    delete row[0].tinhTrangXe;
-    delete row[0].tinhTrangThue;
-    res.json(row[0]);
+    // let entity = {
+    //     baoDuong : {
+    //         soHieuXe: rows[0].soHieuXe,
+    //         tinhTrangBaoDuong: rows[0].tinhTrangBaoDuong,
+    //     },
+    //     chiTiet: []
+    // }
+    // for(const row of rows){
+    //     const chiTiet = {
+    //         tenPhuTung: row.tenPhuTung,
+    //         idPhuTung: row.idPhuTung,
+    //         tinhTrang: row.tinhTrangPhuTung
+    //     }
+    //     entity.chiTiet.push(chiTiet);
+    // }
+
+    let entity = {
+        baoDuong : {
+            soHieuXe: rows[0].soHieuXe,
+            tinhTrangBaoDuong: rows[0].tinhTrangBaoDuong,
+        },
+        chiTiet: {}
+    }
+    for(const row of rows){
+        switch (row.idPhuTung) {
+            case 1:
+                entity.chiTiet.voXe = row.tinhTrangPhuTung;
+                break;
+            case 2:
+                entity.chiTiet.ruotXe = row.tinhTrangPhuTung;
+                break;
+            case 3:
+                entity.chiTiet.tuiKhi = row.tinhTrangPhuTung;
+                break;
+            case 4:
+                entity.chiTiet.thangXe = row.tinhTrangPhuTung;
+                break;
+            case 5:
+                entity.chiTiet.gheXe = row.tinhTrangPhuTung;
+                break;
+            default:
+                entity.chiTiet.guongXe = row.tinhTrangPhuTung;
+                break;
+        }
+    }
+    res.json(entity);
   }
-}),
+});
 
 router.patch('/:id', async (req, res) => {
   if(isNaN(req.params.id)){

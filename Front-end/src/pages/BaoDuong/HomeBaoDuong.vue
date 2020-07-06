@@ -60,14 +60,19 @@
                             </template>
                             <template v-slot:cell(actions)="row">
                                 <div class="md-table-cell-container">
-                                    <button title="Chi tiết bảo dưỡng" type="button" @click="xemChiTiet(row.item.id)" 
+                                    <button title="Chi tiết bảo dưỡng" 
+                                        type="button" 
+                                        @click="xemChiTiet(row.item.idXeOto)" 
                                         class="md-button md-just-icon md-theme-default md-info md-simple"
                                     >
                                         <div class="md-ripple"> <div class="md-button-content">
                                         <md-icon>info</md-icon>
                                         </div></div>
                                     </button>
-                                    <button v-show="row.item.tinhTrang === 'Cần bảo dưỡng'" title="Cập nhật bảo dưỡng" type="button" @click="updateBaoDuong(row.item.id)" 
+                                    <button v-show="row.item.tinhTrang === 'Cần bảo dưỡng'" 
+                                        title="Cập nhật bảo dưỡng"
+                                        type="button"
+                                        @click="updateBaoDuong(row.item.idXeOto)" 
                                         class="md-button md-just-icon md-theme-default md-info md-simple"
                                     >
                                         <div class="md-ripple"> <div class="md-button-content">
@@ -144,7 +149,6 @@ export default {
 
     mounted(){
         this.getBaoDuong();
-        this.getTinhTrang();
     },
 
     methods: {
@@ -177,16 +181,13 @@ export default {
             })
         },
 
-        async getTinhTrang(){
-
+        updateBaoDuong(id){
+            this.$router.push({name:'Cập nhật Bảo dưỡng', params:{id}});
         },
 
-        updateBaoDuong(){
-            this.$router.push({name:'Cập nhật Bảo dưỡng', params:{update : true}});
-        },
-
-        xemChiTiet(){
-            this.$router.push({name:'Xem chi tiết Bảo dưỡng'});
+        xemChiTiet(id){
+            console.log(id);
+            this.$router.push({name:'Xem chi tiết Bảo dưỡng', params:{id}});
         }
     }
 };
