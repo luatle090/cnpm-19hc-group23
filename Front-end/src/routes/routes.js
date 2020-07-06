@@ -87,17 +87,27 @@ const routes = [
       {
         path: "baoduong",
         name: "Bảo dưỡng",
-        component: () => import("../pages/BaoDuong/HomeBaoDuong"),
-      },
-      {
-        path: "detailbaoduong",
-        name: "Xem chi tiết Bảo dưỡng",
-        component: () => import("../pages/BaoDuong/DetailBaoDuong"),
-      },
-      {
-        path: "updatebaoduong",
-        name: "Cập nhật Bảo dưỡng",
-        component: () => import("../pages/BaoDuong/UpdateBaoDuong"),
+        component: () => import("../pages/BaoDuong/Content"),
+        redirect: "/baoduong/",
+        children:[
+          {
+            path: "/",
+            name: "Bảo dưỡng",
+            component: () => import("../pages/BaoDuong/HomeBaoDuong"),
+            props: true,
+          },
+          {
+            path: "detailbaoduong",
+            name: "Xem chi tiết Bảo dưỡng",
+            component: () => import("../pages/BaoDuong/DetailBaoDuong"),
+          },
+          {
+            path: "capnhat/:id",
+            name: "Cập nhật Bảo dưỡng",
+            component: () => import("../pages/BaoDuong/UpdateBaoDuong"),
+            props: { update: true }
+          },
+        ]
       },
       {
         path: "xeoto",

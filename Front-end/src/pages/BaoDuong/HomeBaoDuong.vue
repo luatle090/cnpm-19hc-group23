@@ -21,7 +21,7 @@
                                     <md-input v-model="filter.tinhTrang"></md-input>
                                 </md-field>
                             </div>
-                            <div class="md-layout-item md-small-size-100 md-size-30">
+                            <!-- <div class="md-layout-item md-small-size-100 md-size-30">
                                 <md-datepicker v-model="filter.ngayThueXe" required md-immediately>
                                     <label>Ngày bảo dưỡng lần cuối</label>
                                     <md-input v-model="filter.ngayBaoDuongLanCuoi"></md-input>
@@ -32,7 +32,7 @@
                                     <label>Ngày bảo dưỡng</label>
                                     <md-input v-model="filter.ngayBaoDuong"></md-input>
                                 </md-datepicker>
-                            </div>
+                            </div> -->
                         </div>
 
                          <div class="md-layout-item md-small-size-100 md-size-100 text-right">
@@ -40,7 +40,7 @@
                         </div>
                         <div>
                             <b-table id="my-table" striped hover 
-                                :items="dsHopDong"
+                                :items="dsBaoDuong"
                                 :fields="headers"
                                 :per-page="perPage"
                                 responsive
@@ -78,7 +78,7 @@
                                     v-model="currentPage"
                                     :total-rows="totalRows"
                                     :per-page="perPage"
-                                    @input="getNhacNo"
+                                    @input="getBaoDuong"
                                     aria-controls="my-table"
                                 ></b-pagination>
                             </div>
@@ -119,7 +119,8 @@ export default {
             message: 'Tạo nhắc nợ thành công',
             headers: [
                 { key: 'soHieuXe', label: 'Số hiệu xe' },
-                { key: 'hangXe', label: 'Hãng xe' },
+                { key: 'tenHangXe', label: 'Hãng xe' },
+                { key: 'tenDongXe', label: 'Dòng xe' },
                 { key: 'ngayBaoDuong', label: 'Ngày bảo dưỡng lần cuối' },
                 { key: 'tinhTrang', label: 'Tình trạng' },
                 { key: 'actions', label: 'Thao tác' }
@@ -131,29 +132,55 @@ export default {
                 masked: false
             },
 
-            dsHopDong: [
-                {soHieuXe: "Toyota01", hangXe: "Toyota", ngayBaoDuong: "05/05/2020", tinhTrang: "Cần bảo dưỡng"},
-                {soHieuXe: "Huyndai02", hangXe: "Toyota", ngayBaoDuong: "09/06/2020", tinhTrang: "Đã bảo dưỡng"},
-                {soHieuXe: "Inova01", hangXe: "Toyota", ngayBaoDuong: "03/05/2020", tinhTrang: "Cần bảo dưỡng"},
-                {soHieuXe: "Inova02", hangXe: "Toyota", ngayBaoDuong: "11/05/2020", tinhTrang: "Cần bảo dưỡng"},
-                {soHieuXe: "Kia01", hangXe: "Toyota", ngayBaoDuong: "15/04/2020", tinhTrang: "Cần bảo dưỡng"},
-                {soHieuXe: "Kia03", hangXe: "Toyota", ngayBaoDuong: "10/04/2020", tinhTrang: "Cần bảo dưỡng"},
-                {soHieuXe: "Nissan02", hangXe: "Toyota", ngayBaoDuong: "03/06/2020", tinhTrang: "Đã bảo dưỡng"},
-                {soHieuXe: "Nissan01", hangXe: "Toyota", ngayBaoDuong: "05/06/2020", tinhTrang: "Đã bảo dưỡng"},
-                {soHieuXe: "Toyota02", hangXe: "Toyota", ngayBaoDuong: "06/06/2020", tinhTrang: "Đã bảo dưỡng"},
-                {soHieuXe: "Toyota03", hangXe: "Toyota", ngayBaoDuong: "03/06/2020", tinhTrang: "Đã bảo dưỡng"},
-                {soHieuXe: "Toyota05", hangXe: "Toyota", ngayBaoDuong: "03/04/2020", tinhTrang: "Cần bảo dưỡng"},
-            ]
+            dsBaoDuong: []
         };
     },
 
+    mounted(){
+        this.getBaoDuong();
+        this.getTinhTrang();
+    },
+
     methods: {
+        ...mapActions(['getToken']),
+
+        async getBaoDuong(){
+            const accessToken = await this.getToken();
+            let properties = {
+                limit: this.perPage,
+                offset: this.currentPage - 1,
+            };
+            if("" !== this.filter.soHieuXe){
+                properties.soHieuXe = this.filter.soHieuXe;
+            }
+            if("" !== this.filter.tinhTrang){
+                properties.tinhTrang = this.filter.tinhTrang;
+            }
+
+
+            return axios.get('/baoduong', {
+                headers: {
+                    "x-access-token": accessToken
+                },
+                params: properties
+            }).then(res => {
+                this.dsBaoDuong = res.data.listResult;
+                this.totalRows =res.data.totalItems;
+            }).catch( err => {
+                console.log(err);
+            })
+        },
+
+        async getTinhTrang(){
+
+        },
+
         updateBaoDuong(){
-            this.$router.replace({name:'Cập nhật Bảo dưỡng', params:{update : true}});
+            this.$router.push({name:'Cập nhật Bảo dưỡng', params:{update : true}});
         },
 
         xemChiTiet(){
-            this.$router.replace({path:'detailBaoDuong'});
+            this.$router.push({name:'Xem chi tiết Bảo dưỡng'});
         }
     }
 };

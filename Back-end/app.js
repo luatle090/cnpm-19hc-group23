@@ -31,6 +31,7 @@ app.use('/api/khachhang', verifyAccessToken, require('./routes/KhachHang.route')
 app.use('/api/xeoto', verifyAccessToken, require('./routes/XeOto.route'));
 app.use('/api/hopdong', verifyAccessToken, require('./routes/HopDong.route'));
 app.use('/api/thanhtoan', verifyAccessToken, require('./routes/ThanhToan.route'));
+app.use('/api/baoduong', verifyAccessToken, require('./routes/BaoDuong.route'));
 //app.use('/api/lichsubaoduong', verifyAccessToken, require('./routes/LichSuBaoDuong.route'));
 //app.use('/api/khachhang', verifyAccessToken, require('./routes/KhachHang.route'));
 //app.use('/api/khachhang', verifyAccessToken, require('./routes/KhachHang.route'));
