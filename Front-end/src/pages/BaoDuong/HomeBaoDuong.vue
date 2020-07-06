@@ -17,8 +17,11 @@
                             </div>
                              <div class="md-layout-item md-small-size-100 md-size-30">
                                 <md-field>
-                                    <label>Tình trạng</label>
-                                    <md-input v-model="filter.tinhTrang"></md-input>
+                                    <md-select v-model="filter.tinhTrang" placeholder="Tình trạng">
+                                        <md-option value="">Loại xe</md-option>
+                                        <md-option value="9">Cần bảo dưỡng</md-option>
+                                        <md-option value="10">Đã bảo dưỡng</md-option>
+                                    </md-select>
                                 </md-field>
                             </div>
                             <!-- <div class="md-layout-item md-small-size-100 md-size-30">
@@ -36,10 +39,10 @@
                         </div>
 
                          <div class="md-layout-item md-small-size-100 md-size-100 text-right">
-                             <md-button class="btn-search md-raised md-success">Tìm kiếm</md-button>
+                             <md-button class="btn-search md-raised md-success" @click="getBaoDuong">Tìm kiếm</md-button>
                         </div>
                         <div>
-                            <b-table id="my-table" striped hover 
+                            <b-table id="my-table" striped hover show-empty
                                 :items="dsBaoDuong"
                                 :fields="headers"
                                 :per-page="perPage"
@@ -51,6 +54,9 @@
                                 <b-spinner class="align-middle"></b-spinner>
                                 <strong>Loading...</strong>
                                 </div>
+                            </template>
+                            <template v-slot:empty>
+                                <h4>Không có dữ liệu</h4>
                             </template>
                             <template v-slot:cell(actions)="row">
                                 <div class="md-table-cell-container">

@@ -6,11 +6,14 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   const id = req.params.id || -1;
+
+  await capNhatTinhTrang();
+  
   const soHieuXe = req.query.soHieuXe || '';
-  const tinhTrangXe = req.query.tinhTrang || '';
+  const tinhTrangBaoDuong = req.query.tinhTrang || '';
   const entity = {
       soHieuXe,
-      tinhTrangXe
+      tinhTrangBaoDuong
   }
   if(isNaN(req.query.limit)){
     throw createError(400, 'Invalid limit.');
@@ -42,26 +45,11 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/allsohieuxe', async (req, res) => {
-  const row = await xeModel.getAllSoHieuXe();
-  if(row.length === 0){
-    res.status(204);
-  }
-  else{
-    res.json(row);
-  }
-}),
+async function capNhatTinhTrang(){
+   const result = await baoDuongModel.capNhatTinhTrang();
+   return result[1].affectedRows;
+}
 
-router.get('/allsohieuxe/:sohieuxe', async (req, res) => {
-  const row = await xeModel.getAllSoHieuXe();
-  if(row.length === 0){
-    res.status(204);
-  }
-  else{
-    console.log(row[0]);
-    res.json(row);
-  }
-}),
 
 router.get('/:id', async (req, res) => {
   if (isNaN(req.params.id)) {
@@ -82,44 +70,6 @@ router.get('/:id', async (req, res) => {
     res.json(row[0]);
   }
 }),
-
-router.post('/', async (req, res) => {
-  if(isNaN(req.body.idDongXe)){
-    throw createError(400, 'Invalid idDongXe.');
-  }
-  if(isNaN(req.body.idLoaiXe)){
-    throw createError(400, 'Invalid idLoaiXe.');
-  }
-  if(!req.body.mauSac){
-    throw createError(400, 'Invalid mauSac.');
-  }
-  if(isNaN(req.body.giaThue)){
-    throw createError(400, 'Invalid giaThue.');
-  }
-  if(isNaN(req.body.giaTriXe)){
-    throw createError(400, 'Invalid giaTriXe.');
-  }
-  if(isNaN(req.body.phanTramDatCoc)){
-    throw createError(400, 'Invalid phan tram dat coc.');
-  }
-  if(isNaN(req.body.tienDatCoc)){
-    throw createError(400, 'Invalid tien dat coc.');
-  }
-
-  req.body.tinhTrangXe = 1;
-  req.body.tinhTrangThue = 4;
-
-  const soHieuXe = await xeModel.phatSinhSoHieuXe();
-  req.body.soHieuXe = soHieuXe[2][0].soHieuXe;
-  console.log(soHieuXe[2][0]);
-  delete req.body.idHangXe;
-  const results = await xeModel.add(req.body);
-  const ret = {
-    id: results.insertId,
-    ...req.body
-  }
-  res.status(201).json(ret);
-});
 
 router.patch('/:id', async (req, res) => {
   if(isNaN(req.params.id)){
