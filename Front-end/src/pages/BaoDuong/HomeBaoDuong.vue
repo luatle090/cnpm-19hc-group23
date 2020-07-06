@@ -2,7 +2,7 @@
     <div class="content">
         <div class="md-layout">
             <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" >
-                <b-alert v-model="show" variant="success"  dismissible>{{ message }}</b-alert>
+                <b-alert v-model="showMS" :variant="erro ? 'danger' : 'success'" dismissible>{{ message }}</b-alert>
                 <md-card>
                     <md-card-header data-background-color="green">
                         <h4 class="title">{{ title }}</h4>
@@ -109,7 +109,17 @@ import { mapActions, mapGetters, mapMutations } from "vuex";
 import EventSource from "eventsource";
 
 export default {
-    props: ['showMS'],
+    props: {
+        message: String,
+        showMS: {
+            default: false,
+            type: Boolean
+        },
+        erro: {
+            default: false,
+            type: Boolean
+        }
+    },
     data() {
         return {
             title: 'Bảo dưỡng',
@@ -119,7 +129,6 @@ export default {
             loai: 0,
             tinhTrang: '',
             isBusy: false,
-            show: false,
             filter: {
                 soHieuXe: "",
                 ngayBaoDuong: null,
@@ -127,7 +136,6 @@ export default {
                 tinhTrang: "",
             },
 
-            message: 'Tạo nhắc nợ thành công',
             headers: [
                 { key: 'soHieuXe', label: 'Số hiệu xe' },
                 { key: 'tenHangXe', label: 'Hãng xe' },

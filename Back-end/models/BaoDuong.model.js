@@ -6,8 +6,33 @@ module.exports = {
     return db.load(sql);
   },
 
-  loadById: id => {
-    const sql = `select * from lichsubaoduong where id = ${id}`;
+  loadNgayBaoDuongByIdXeOto: id => {
+      const sql = `select ls.idLichSuBaoDuong, DATE_FORMAT(ls.ngayBaoDuong, "%d/%m/%Y") as ngayBaoDuong,
+                    case when xe.ngayBaoDuongLanCuoi = ls.ngayBaoDuong
+                        then 1
+                        else 0
+                    end as ngayMacDinh
+                    from lichsubaoduong ls
+                    inner join xeoto xe on xe.idXeOto = ls.idXeOto
+                    where ls.idXeOto = ${id}
+                    order by ls.ngayBaoDuong desc `;
+      return db.load(sql);
+  },
+
+  loadByIdXeOto: (id, ngayBaoDuong) => {
+    const sql = `select xe.soHieuXe, tt.moTa as tinhTrangBaoDuong, pt.tenPhuTung, ct.idPhuTung,
+                tt2.moTa as tinhTrangPhuTung
+                from lichsubaoduong ls
+                inner join xeoto xe on xe.idXeOto = ls.idXeOto
+                inner join chitietbaoduong ct on ls.idLichSuBaoDuong = ct.idLichSu
+                inner join tinhtrang tt on ls.tinhTrang = tt.idTinhTrang
+                inner join tinhtrang tt2 on ct.tinhTrang = tt2.idTinhTrang
+                inner join phutung pt on pt.idPhuTung = ct.idPhuTung
+                where xe.idXeOto = ${id} and
+                    if('${ngayBaoDuong}' = '', 
+                        ls.ngayBaoDuong = xe.ngayBaoDuongLanCuoi, 
+                        ls.ngayBaoDuong = str_to_date('${ngayBaoDuong}', '%d/%m/%y')
+                    )`;
     return db.load(sql);
   },
 

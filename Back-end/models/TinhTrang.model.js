@@ -1,10 +1,10 @@
 const db = require('../utils/db');
 
 module.exports = {
-  loadByCode: id => {
-    const sql = `select * from tinhtrang where id = ?`;
+  loadByCode: code => {
+    const sql = `select idTinhTrang, moTa from tinhtrang where code = '${code}'`;
 
-    return db.select(sql, [id]);
+    return db.load(sql);
   },
 
   add: entity => db.add(entity, 'tinhtrang'),
