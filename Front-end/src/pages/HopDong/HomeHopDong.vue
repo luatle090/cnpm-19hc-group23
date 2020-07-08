@@ -58,13 +58,13 @@
                             </template>
                             <template v-slot:cell(actions)="row">
                                 <div class="md-table-cell-container">
-                                    <button title="Chi tiết" type="button" @click="detailedNhacNo(row.item.id)" 
+                                    <!-- <button title="Chi tiết" type="button" @click="detailedNhacNo(row.item.id)" 
                                         class="md-button md-just-icon md-theme-default md-info md-simple"
                                     >
                                         <div class="md-ripple"> <div class="md-button-content">
                                         <md-icon>info</md-icon>
                                         </div></div>
-                                    </button>
+                                    </button> -->
                                     <button title="Cập nhật" v-show="row.item.tinhTrang == 'Đang thuê'" type="button" @click="updateHopDong(row.item.idHopDong)" 
                                         class="md-button md-just-icon md-theme-default md-info md-simple"
                                     >
@@ -72,21 +72,25 @@
                                         <md-icon>edit</md-icon>
                                         </div></div>
                                     </button>
-                                    <button type="button" v-show="row.item.tinhTrang == 'Đang thuê'" title="Xóa" @click="deleteNhacNo(row)" 
+                                    <button type="button" v-show="row.item.tinhTrang == 'Đang thuê' && row.item.tinhTrangXe == 'Bình thường'" 
+                                        title="Trả xe" 
+                                        @click="showDialogTraXe(row.item)" 
                                         class="md-button md-just-icon md-theme-default md-danger md-simple"
                                     >
                                         <div class="md-ripple"> <div class="md-button-content">
-                                        <md-icon>delete</md-icon>
+                                        <md-icon>done</md-icon>
                                         </div></div>
                                     </button>
                                     <button title="Xuất hợp đồng" type="button"
                                         class="md-button md-just-icon md-theme-default md-info md-simple"
+                                        @click="exportHopDong(row.item.idHopDong)" 
                                     >
                                         <div class="md-ripple"> <div class="md-button-content">
                                         <md-icon>save_alt</md-icon>
                                         </div></div>
                                     </button>
-                                    <button v-show="row.item.tinhTrang == 'Đang thuê'" title="Thanh toán hợp đồng" type="button" @click="thanhToanHopDong"
+                                    <button v-show="row.item.tinhTrang == 'Đang thuê'" title="Thanh toán hợp đồng" type="button" 
+                                        @click="thanhToanHopDong(row.item.idHopDong)"
                                         class="md-button md-just-icon md-theme-default md-info md-simple"
                                     >
                                         <div class="md-ripple"> <div class="md-button-content">
@@ -113,6 +117,25 @@
                 </md-card>
             </div>
         </div>
+        <md-dialog :md-active.sync="showDialog">
+
+        <md-card-content>
+          <div class="md-layout primary">
+          <div class="md-layout-item md-size-90">
+              <div class="md-layout">
+                  <div class="md-layout-item md-small-size-100 md-size-100">
+                    <label>{{ messageTraXe }}</label>
+                  </div>
+              </div>
+          </div>
+          </div>
+        </md-card-content>
+
+        <md-dialog-actions>
+            <md-button class="md-light" @click="showDialog = false">Đóng</md-button>
+            <md-button class="md-success" v-show="showCapNhat" @click="traXe">Cập nhật</md-button>
+        </md-dialog-actions>
+    </md-dialog>
     </div>
 </template>
 
@@ -143,6 +166,11 @@ export default {
             loai: 0,
             tinhTrang: '',
             isBusy: false,
+            showDialog: false,
+            soHieuXe: "",
+            idHopDong: 0,
+            messageTraXe: "",
+            showCapNhat: true,
             filter: {
                 maHopDong: "",
                 ngayThueXe: null,
@@ -195,8 +223,38 @@ export default {
             this.$router.push({name:'Cập nhật hợp đồng', params:{id}});
         },
 
-        thanhToanHopDong(){
-            this.$router.replace({path:'thanhtoan'});
+        thanhToanHopDong(id){
+            this.$router.push({name:'Thanh toán', params: {id}});
+        },
+
+        showDialogTraXe(hopDong){
+            this.showDialog = true;
+            this.soHieuXe = hopDong.soHieuXe;
+            this.idHopDong = hopDong.idHopDong;
+            this.showCapNhat = true;
+            this.messageTraXe = "Cập nhật khách hàng trả xe. Bạn có muốn tiếp tục?";
+        },
+
+        async traXe(){
+            const accessToken = await this.getToken();
+            const data = {
+                soHieuXe: this.soHieuXe,
+                idHopDong: this.idHopDong
+            }
+            axios({
+                method: 'patch',
+                url: 'traxe',
+                headers: {
+                    "x-access-token": accessToken
+                },
+                data
+            }).then(res => {
+                this.showCapNhat = false;
+                this.messageTraXe = "Cập nhật thành công";
+            }).catch(err => {
+                this.showCapNhat = false;
+                this.messageTraXe = "Cập nhật thất bại. Vui lòng liên hệ Quản trị viên";
+            })
         },
 
         async getHopDong(){
@@ -231,6 +289,29 @@ export default {
                 console.log(err);
             })
         },
+
+        async exportHopDong(id){
+            const accessToken = await this.getToken();
+            axios({
+                method: 'post',
+                url: '/hopdong/export',
+                headers: {
+                    "x-access-token": accessToken
+                },
+                responseType: 'arraybuffer',
+                data:{
+                    id
+                },
+            }).then(res => {
+                console.log(res);
+                let blob = new Blob([res.data], { type: 'application/pdf' }),
+                url = window.URL.createObjectURL(blob)
+
+                window.open(url) 
+            }).catch(err => {
+                console.log(err);
+            });
+        }
     },
     
     // mounted() {

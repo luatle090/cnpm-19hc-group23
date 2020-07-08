@@ -11,6 +11,11 @@ module.exports = {
     return db.load(sql);
   },
 
+  loadByIdHopDong: id => {
+    const sql = `select * from chitiethopdong where idHopDong = ${id}`;
+    return db.load(sql);
+  },
+
   add: entity => db.add(entity, 'chitiethopdong'),
   del: id => db.del({ id: id }, 'chitiethopdong'),
   patch: (id, entity) => {

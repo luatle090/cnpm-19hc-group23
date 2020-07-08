@@ -153,15 +153,4 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.patch('/:id', async (req, res) => {
-  if(isNaN(req.params.id)){
-    throw createError(400, 'Invalid idDongXe.');
-  }
-  const phanTramDatCoc = Number(req.body.phanTramDatCoc);
-  const giaTriXe = Number(req.body.giaTriXe);
-  req.body.tienDatCoc = phanTramDatCoc * giaTriXe / 100;
-  const results = await xeModel.patch(req.params.id, req.body);
-  res.json(results);
-});
-
 module.exports = router;

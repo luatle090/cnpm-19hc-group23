@@ -4,8 +4,12 @@ const createError = require('http-errors');
 const hopDongModel = require('../models/HopDong.model');
 const chiTietHDModel = require('../models/ChiTietHopDong.model');
 const xeModel = require('../models/xeOto.model');
+const pdfMake = require('pdfmake/build/pdfmake');
+const vfsFonts = require('pdfmake/build/vfs_fonts');
+const lib = require('../utils/lib');
 
 const router = express.Router();
+pdfMake.vfs = vfsFonts.pdfMake.vfs;
 
 router.get('/', async (req, res) => {
   const maHopDong = req.query.maHopDong || '';
@@ -55,6 +59,55 @@ router.get('/', async (req, res) => {
     res.end('View error log on console.');
   }
 });
+
+
+router.get('/payment/:id', async (req, res) => {
+  const rows = await hopDongModel.getInfoPaymentByIdHopDong(req.params.id);
+  const rowsChiTiet = await hopDongModel.getChiTietDenBuByIdHopDong(req.params.id);
+  if(rows.length === 0){
+    res.status(204);
+  } else {
+    let entity = {
+      thanhToan: rows[0],
+      chiTiet: {
+        voXe: '0 VNĐ',
+        ruotXe: '0 VNĐ',
+        tuiKhi: '0 VNĐ',
+        thangXe: '0 VNĐ',
+        gheXe: '0 VNĐ',
+        guongXe: '0 VNĐ',
+      }
+    }
+    entity.thanhToan.giaThue = lib.phanCachTien(entity.thanhToan.giaThue);
+    entity.thanhToan.giaNgayThue = lib.phanCachTien(entity.thanhToan.giaNgayThue);
+    entity.thanhToan.chiPhiDenBu = lib.phanCachTien(entity.thanhToan.chiPhiDenBu);
+    entity.thanhToan.tongCong = lib.phanCachTien(entity.thanhToan.tongCong);
+    for(const chiTiet of rowsChiTiet){
+      switch (chiTiet.idPhuTung) {
+        case 1:
+            entity.chiTiet.voXe = lib.phanCachTien(chiTiet.giaPhuTung);
+            break;
+        case 2:
+            entity.chiTiet.ruotXe = lib.phanCachTien(chiTiet.giaPhuTung);
+            break;
+        case 3:
+            entity.chiTiet.tuiKhi = lib.phanCachTien(chiTiet.giaPhuTung);
+            break;
+        case 4:
+            entity.chiTiet.thangXe = lib.phanCachTien(chiTiet.giaPhuTung);
+            break;
+        case 5:
+            entity.chiTiet.gheXe = lib.phanCachTien(chiTiet.giaPhuTung);
+            break;
+        default:
+            entity.chiTiet.guongXe = lib.phanCachTien(chiTiet.giaPhuTung);
+            break;
+      }
+    }
+    res.json(entity);
+  }
+
+});
   
 router.get('/:id', async (req, res) => {
   if (isNaN(req.params.id)) {
@@ -74,7 +127,7 @@ router.get('/:id', async (req, res) => {
     delete row[0].tinhTrangThue;
     res.json(row[0]);
   }
-}),
+});
 
 router.post('/', async (req, res) => {
   const userId = res.locals.token.userId;
@@ -132,10 +185,54 @@ router.post('/', async (req, res) => {
       id: results.insertId,
       ...req.body
     }
+
+    const entityXe = {
+      tinhTrangThue: 3
+    }
+    await xeModel.patch(entityChiTiet.idXeOto, entityXe);
     res.status(201).json(ret);
   }
-})
+});
 
+router.post('/export', async (req, res) => {
+  if(!req.body.id){
+    throw createError(400, 'Invalid id.');
+  }
+
+  const id = req.body.id;
+
+  const row = await hopDongModel.loadById(id);
+  if(row.length === 0){
+    res.status(204).end();
+  } else {
+    const giaThue = lib.phanCachTien(row[0].giaThue);
+    const tienDatCoc = lib.phanCachTien(row[0].soTienDatCoc);
+
+    var documentDefinition = {
+      content: [
+          `Hello ` ,
+          'Nice to meet you!'
+      ]        
+    };
+    const pdfDoc = pdfMake.createPdf(documentDefinition);
+    pdfDoc.getBase64((data)=>{
+        res.writeHead(200, 
+        {
+            'Content-Type': 'application/pdf',
+            'Content-Disposition':'attachment;filename="filename.pdf"'
+        });
+  
+        const download = Buffer.from(data.toString('utf-8'), 'base64');
+        res.end(download);
+    });
+
+  }
+  
+});
+
+router.patch('/payment/:id', async (req, res) => {
+
+})
 
 router.patch('/:id', async (req, res) => {
   if(isNaN(req.params.id)){
@@ -171,8 +268,6 @@ router.patch('/:id', async (req, res) => {
     res.status(404).end();
   }
   else {
-    const maHD = await hopDongModel.phatSinhMaHopDong();
-    //console.log(maHD[2][0]);
     const entityHopDong = {
       idHopDong: req.params.id,
       ngayThue,
@@ -181,7 +276,8 @@ router.patch('/:id', async (req, res) => {
     }
 
     const results = await hopDongModel.patch(req.params.id, entityHopDong);
-
+    const rowsOldXe = await chiTietHDModel.loadByIdHopDong(req.params.id);
+    
     const entityChiTiet = {
       idHopDong: req.params.id,
       giaThue: rowXe[0].giaThue,
@@ -189,6 +285,16 @@ router.patch('/:id', async (req, res) => {
       idXeOto: rowXe[0].idXeOto
     };
     const resultsChiTiet = await chiTietHDModel.patch(req.params.id, entityChiTiet);
+
+    let entityXe = {
+      tinhTrangThue: 4
+    }
+    //old
+    await xeModel.patch(rowsOldXe[0].idXeOto, entityXe);
+
+    entityXe.tinhTrangThue = 3;
+    //new
+    await xeModel.patch(entityChiTiet.idXeOto, entityXe);
 
     const ret = {
       id: results.insertId,

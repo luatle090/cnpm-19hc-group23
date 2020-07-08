@@ -1,4 +1,4 @@
-function phanCachTien({}, money){
+function phanCachTien(money){
     if(isNaN(money))
         money = Number(money);
 

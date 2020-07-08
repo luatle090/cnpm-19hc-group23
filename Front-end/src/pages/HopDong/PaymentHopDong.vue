@@ -13,57 +13,70 @@
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
                     <label>Mã hợp đồng</label>
-                    <md-input required disabled v-model.trim="maHD" type="text" ></md-input>
+                    <md-input required disabled v-model="thanhToan.maHopDong" type="text" ></md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
                     <label>Họ tên</label>
-                    <md-input v-bind:value="hoTen" disabled required type="text" ></md-input>
+                    <md-input v-bind:value="thanhToan.hoTen" disabled required type="text" ></md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
                     <label>CMND</label>
-                    <md-input required v-model.number="CMND" disabled type="text"> </md-input>
+                    <md-input required v-model="thanhToan.CMND" disabled type="text"> </md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
                     <label>Địa chỉ</label>
-                    <md-input v-model.trim="diaChi" required disabled type="text" ></md-input>
+                    <md-input v-model.trim="thanhToan.diaChi" required disabled type="text" ></md-input>
                   </md-field>
                 </div>
                   <div class="md-layout-item md-small-size-100 md-size-100">
-                    <md-datepicker v-model="ngayThueXe" required md-immediately :md-disabled-dates="disabledDates">
+                    <md-datepicker v-model="thanhToan.ngayThueXe" required md-immediately :md-disabled-dates="disabledDates">
                       <label>Ngày thuê xe</label>
                     </md-datepicker>    
                 </div>
                   <div class="md-layout-item md-small-size-100 md-size-100">
-                    <md-datepicker v-model="ngayTraXe" required md-immediately :md-disabled-dates="disabledDates">
+                    <md-datepicker v-model="thanhToan.ngayTraXe" required md-immediately :md-disabled-dates="disabledDates">
                       <label>Ngày trả xe</label>
                     </md-datepicker>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
                     <label>Số hiệu xe</label>
-                    <md-input v-model.trim="soHieuXe" disabled required type="text" ></md-input>
+                    <md-input v-model.trim="thanhToan.soHieuXe" disabled required type="text" ></md-input>
+                  </md-field>
+                </div>
+                <div class="md-layout-item md-small-size-100 md-size-100">
+                  <md-field>
+                    <label>Giá thuê</label>
+                    <md-input v-model.trim="thanhToan.giaThue" disabled required type="text" ></md-input>
+                  </md-field>
+                </div>
+                <div class="md-layout-item md-small-size-100 md-size-100">
+                  <md-field>
+                    <label>Giá ngày thuê</label>
+                    <md-input v-model.trim="thanhToan.giaNgayThue" disabled required type="text" ></md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
                     <label>Chi phí đền bù</label>
-                    <md-input v-model.trim="chiPhiDenBu" disabled required type="text" ></md-input>
+                    <md-input v-model.trim="thanhToan.chiPhiDenBu" disabled required type="text" ></md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
                     <label>Tổng thanh toán</label>
-                    <md-input v-model.trim="thanhToan" disabled required type="text" ></md-input>
+                    <md-input v-model.trim="thanhToan.tongCong" disabled required type="text" ></md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100 text-right">
                   <md-button type="button" to="/hopdong" class="btn-huy md-raised md-danger">Quay lại</md-button>
+                  <md-button type="button" @click="showDialog = true" class="btn-huy md-raised md-success">Chi tiết</md-button>
                   <md-button type="submit" class="md-raised md-success">Thanh toán hợp đồng</md-button>
                 </div>
               </div>
@@ -72,6 +85,56 @@
         </form>
       </div>
     </div>
+
+     <md-dialog :md-active.sync="showDialog">
+      <md-dialog-title>Thông tin chi tiết đền bù</md-dialog-title>
+
+      <md-card-content>
+        <div class="md-layout primary">
+          <div class="md-layout-item md-small-size-100 md-size-100">
+            <md-field>
+              <label>Lốp xe</label>
+              <md-input required v-model="chiTiet.ruotXe" disabled type="text"> </md-input>
+            </md-field>
+          </div>
+          <div class="md-layout-item md-small-size-100 md-size-100">
+            <md-field>
+              <label>Vỏ xe</label>
+              <md-input v-model.trim="chiTiet.voXe" disabled required type="text" ></md-input>
+            </md-field>
+          </div>
+          <div class="md-layout-item md-small-size-100 md-size-100">
+            <md-field>
+              <label>Ghế xe</label>
+              <md-input v-model.trim="chiTiet.gheXe" disabled required type="text" ></md-input>
+            </md-field>
+          </div>
+          <div class="md-layout-item md-small-size-100 md-size-100">
+            <md-field>
+              <label>Gương chiếu hậu</label>
+              <md-input v-model.trim="chiTiet.guongXe" disabled required type="text" ></md-input>
+            </md-field>
+          </div>
+          <div class="md-layout-item md-small-size-100 md-size-100">
+            <md-field>
+              <label>Hệ thống thắng xe</label>
+              <md-input v-model.trim="chiTiet.thangXe" disabled required type="text" ></md-input>
+            </md-field>
+          </div>
+          <div class="md-layout-item md-small-size-100 md-size-100">
+            <md-field>
+              <label>Túi khí</label>
+              <md-input v-model.trim="chiTiet.tuiKhi" required disabled type="text" ></md-input>
+            </md-field>
+          </div>
+        </div>
+      </md-card-content>
+
+      <md-dialog-actions>
+        <md-button class="md-primary" @click="showDialog = false">Close</md-button>
+      </md-dialog-actions>
+    </md-dialog>
+
   </div>
 </template>
 <script>
@@ -80,22 +143,38 @@ import { VMoney } from "v-money";
 import { mapActions } from "vuex";
 
 export default {
-  name: "createHopDong",
+  name: "PaymentHopDong",
   data() {
     return {
       erro: false,
       show: false,
-      maHD: "HD0001",
-      hoTen: "Lê Hoàng Luật",
-      CMND: "025423231",
-      diaChi: "227 Nguyễn Văn Cừ, Q.5",
-      ngayTraXe: "22/06/2020",
-      ngayThueXe: "14/06/2020",
-      soHieuXe: "Innova01",
       message: "",
       title: "Thanh toán hợp đồng",
-      chiPhiDenBu: "100.000 VNĐ",
-      thanhToan: "500.000 VNĐ",
+      showDialog : false,
+      thanhToan: {
+        maHopDong: "",
+        hoTen: "",
+        CMND: "",
+        idHopDong: "",
+        ngayTraXe: null,
+        ngayThueXe: null,
+        diaChi: "",
+        soHieuXe: "",
+        giaThue: "",
+        giaNgayThue: "",
+        soTienDatCoc: "",
+        chiPhiDenBu: "",
+        tongCong: ""
+      },
+
+      chiTiet: {
+        tuiKhi: "",
+        voXe: "",
+        ruotXe: "",
+        guongXe: "",
+        thangXe: "",
+        gheXe: "",
+      },
 
       disabledDates: date => {
         const day = date.getDay()
@@ -112,7 +191,30 @@ export default {
     };
   },
 
+  mounted(){
+    this.getThanhToan();
+  },
+
   methods: {
+    ...mapActions(['getToken', 'phanCachTien']),
+
+    async getThanhToan(){
+      const accessToken = await this.getToken();
+
+      axios.get(`/hopdong/payment/${this.$route.params.id}`, {
+        headers: {
+          "x-access-token": accessToken
+        },
+      }).then(res => {
+        this.thanhToan = res.data.thanhToan;
+        this.thanhToan.ngayTraXe = new Date(this.thanhToan.ngayTraXe);
+        this.thanhToan.ngayThueXe = new Date(this.thanhToan.ngayThueXe);
+        this.chiTiet = res.data.chiTiet;
+      }).catch(err => {
+        console.log(err);
+      });
+    },
+
     thanhToanHopDong(){
       this.show = true;
       this.message = "Thanh toán hợp đồng thành công";

@@ -162,6 +162,14 @@ export default {
         }
       }).then(res => {
         this.hopDong = res.data;
+        const xeOto = {
+          soHieuXe: this.hopDong.soHieuXe,
+          tenHangXe: this.hopDong.tenHangXe,
+          tenDongXe: this.hopDong.tenDongXe,
+          giaThue: this.hopDong.giaThue,
+          tienDatCoc: this.hopDong.soTienDatCoc,
+        }
+        this.mapSoHieuXe.set(this.hopDong.soHieuXe, xeOto);
         this.hopDong.ngayTraXe = new Date(this.hopDong.ngayTraXe);
         this.hopDong.ngayThueXe = new Date(this.hopDong.ngayThueXe);
       }).catch(err => {
