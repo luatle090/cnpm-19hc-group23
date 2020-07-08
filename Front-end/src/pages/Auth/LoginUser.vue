@@ -4,7 +4,7 @@
 
       <div class="title">
         <img src="@/assets/img/logo.png">
-        <div class="md-title">Internet Banking</div>
+        <div class="md-title">Quản lý ô tô</div>
         <div class="md-body-2">Đăng nhập</div>
       </div>
 

@@ -118,32 +118,11 @@ export default {
   name: "updateBaoDuong",
   data() {
     return {
-      // erro: false,
-      // show: false,
-      // voXe: "Thay thế",
-      // lopXe: "Thay thế",
-      // tinhTrang: "Hỏng hóc",
-      // tuiKhi: "Bình thường",
-      // thangXe: "Thay thế",
-      // guongChieuHau: "Bình thường",
-      // ngayBaoDuong: "14/06/2020",
-      // gheXe: "Bình thường",
-      // soHieuXe: "Innova01",
-      // message: "",
       ngayBaoDuong: null,
       baoDuong: {
         soHieuXe: "",
         tinhTrangBaoDuong: "",
       },
-      // chiTiet:{
-      //   voXe: "",
-      //   tuiKhi: "",
-      //   gheXe: "",
-      //   ruotXe: "",
-      //   guongXe: "",
-      //   thangXe: "",
-      // },
-
       chiTiet: {
         tuiKhi: {
           id: "",

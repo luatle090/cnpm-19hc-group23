@@ -125,7 +125,7 @@ export default {
             title: 'Bảo dưỡng',
             currentPage: 1,
             perPage: 10,
-            totalRows: 21,
+            totalRows: 0,
             loai: 0,
             tinhTrang: '',
             isBusy: false,

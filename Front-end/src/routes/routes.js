@@ -79,7 +79,7 @@ const routes = [
         ]
       },
       {
-        path: "thanhtoan",
+        path: "thanhtoan/:id",
         name: "Thanh toán",
         component: () => import("../pages/HopDong/PaymentHopDong"),
         props: true
@@ -134,25 +134,49 @@ const routes = [
           },
         ]
       },
-      
       {
         path: "xekhachtra",
         name: "Kiểm tra xe khách trả",
-        component: () => import("../pages/XeKhachTra/HomeXeKhachTra"),
-        props: true
+        component: () => import("../pages/XeKhachTra/Content"),
+        redirect: "/xekhachtra/",
+        children:[
+          {
+            path: "/",
+            name: "Kiểm tra xe khách trả",
+            component: () => import("../pages/XeKhachTra/HomeXeKhachTra"),
+            props: true,
+          },
+          {
+            path: "detailxekhachtra/:id",
+            name: "Chi tiết tình trạng xe khách trả",
+            component: () => import("../pages/XeKhachTra/DetailXeKhachTra"),
+          },
+          {
+            path: "capnhat/:id",
+            name: "Cập nhật xe khách trả",
+            component: () => import("../pages/XeKhachTra/UpdateXeKhachTra"),
+            props: { update: true }
+          },
+        ]
       },
-      {
-        path: "updateXeKhachTra",
-        name: "Cập nhật xe khách trả",
-        component: () => import("../pages/XeKhachTra/UpdateXeKhachTra"),
-        props: true
-      },
-      {
-        path: "detailxekhachtra",
-        name: "Chi tiết tình trạng xe khách trả",
-        component: () => import("../pages/XeKhachTra/DetailXeKhachTra"),
-        props: true
-      },
+      // {
+      //   path: "xekhachtra",
+      //   name: "Kiểm tra xe khách trả",
+      //   component: () => import("../pages/XeKhachTra/HomeXeKhachTra"),
+      //   props: true
+      // },
+      // {
+      //   path: "updateXeKhachTra",
+      //   name: "Cập nhật xe khách trả",
+      //   component: () => import("../pages/XeKhachTra/UpdateXeKhachTra"),
+      //   props: true
+      // },
+      // {
+      //   path: "detailxekhachtra",
+      //   name: "Chi tiết tình trạng xe khách trả",
+      //   component: () => import("../pages/XeKhachTra/DetailXeKhachTra"),
+      //   props: true
+      // },
       {
         path: "baocao",
         name: "Báo cáo",

@@ -83,21 +83,50 @@ export default {
   name: "updateBaoDuong",
   data() {
     return {
-      erro: false,
-      show: false,
-      voXe: "Thay thế",
-      lopXe: "Thay thế",
-      tinhTrang: "Hỏng hóc",
-      tuiKhi: "Bình thường",
-      thangXe: "Thay thế",
-      guongChieuHau: "Bình thường",
-      ngayKiemTra: "14/06/2020",
-      gheXe: "Bình thường",
-      soHieuXe: "Kia01",
-      message: "",
+      dsNgayBaoDuong: [],
+      ngayBaoDuong: "",
+      baoDuong: {
+        soHieuXe: "",
+        tinhTrangBaoDuong: "",
+      },
+      chiTiet: {
+        tuiKhi: "",
+        voXe: "",
+        ruotXe: "",
+        guongXe: "",
+        thangXe: "",
+        gheXe: "",
+      },
       title: "Chi tiết tình trạng xe khách trả"
     };
   },
+
+  mounted(){
+    this.getDetail();
+  },
+
+  methods: {
+    ...mapActions(['getToken']),
+
+    async getDetail(){
+      let properties = {};
+      if(this.ngayBaoDuong){
+        properties.ngayBaoDuong = this.ngayBaoDuong;
+      }
+      const accessToken = await this.getToken();
+      // axios.get(`/traxe/${this.$route.params.id}`, {
+      //   headers: {
+      //     "x-access-token": accessToken
+      //   },
+      //   params: properties
+      // }).then(res => {
+      //   this.baoDuong = res.data.baoDuong;
+      //   this.chiTiet = res.data.chiTiet;
+      // }).catch(err => {
+      //   console.log(err);
+      // });
+    },
+  }
 };
 </script>
 <style scoped>
