@@ -45,14 +45,8 @@
                                 :fields="headers"
                                 :per-page="perPage"
                                 responsive
-                                :busy="isBusy"
                             >
-                            <template v-slot:table-busy>
-                                <div class="text-center text-danger my-2">
-                                <b-spinner class="align-middle"></b-spinner>
-                                <strong>Loading...</strong>
-                                </div>
-                            </template>
+                            
                             <template v-slot:empty>
                                 <h4>Không có dữ liệu</h4>
                             </template>
@@ -89,7 +83,7 @@
                                         <md-icon>save_alt</md-icon>
                                         </div></div>
                                     </button>
-                                    <button v-show="row.item.tinhTrang == 'Đang thuê'" title="Thanh toán hợp đồng" type="button" 
+                                    <button title="Thanh toán hợp đồng" type="button" 
                                         @click="thanhToanHopDong(row.item.idHopDong)"
                                         class="md-button md-just-icon md-theme-default md-info md-simple"
                                     >
@@ -165,7 +159,6 @@ export default {
             totalRows: 0,
             loai: 0,
             tinhTrang: '',
-            isBusy: false,
             showDialog: false,
             soHieuXe: "",
             idHopDong: 0,
@@ -196,19 +189,7 @@ export default {
                 masked: false
             },
 
-            dsHopDong: [
-            //     {idHopDong: 1, maHD: "HD0001", hoTen: "Lê Hoàng Luật", soHieuXe: "Toyota01", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Đang thuê"},
-            //     {maHD: "HD0002", hoTen: "Nguyễn Ngọc Châu", soHieuXe: "Huyndai02", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Đang thuê"},
-            //     {maHD: "HD0003", hoTen: "Nguyễn Mỹ Linh", soHieuXe: "Inova01", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Đang thuê"},
-            //     {maHD: "HD0104", hoTen: "Nguyễn Minh Quân",soHieuXe: "Inova02", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Hoàn tất"},
-            //     {maHD: "HD0105", hoTen: "Trần Anh Tuấn", soHieuXe: "Kia01", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Hoàn tất"},
-            //     {maHD: "HD0200", hoTen: "Lê Mỹ Linh", soHieuXe: "Kia03", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Hoàn tất"},
-            //     {maHD: "HD0201", hoTen: "Nguyễn Anh Thư", soHieuXe: "Nissan02", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Đang thuê"},
-            //     {maHD: "HD0211", hoTen: "Nguyễn Như Ngân",soHieuXe: "Nissan01", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Đang thuê"},
-            //     {maHD: "HD0215", hoTen: "Trần Tuấn Anh", soHieuXe: "Toyota02",ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Đang thuê"},
-            //     {maHD: "HD0301", hoTen: "Lê Khả Như", soHieuXe: "Toyota03",ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Hoàn tất"},
-            //     {maHD: "HD0302", hoTen: "Nguyễn Minh Quân", soHieuXe: "Toyota05", ngayThueXe: "14/06/2020", ngayTraXe: "22/06/2020", tinhTrang: "Hoàn tất"},
-             ]
+            dsHopDong: []
         };
     },
 
@@ -251,6 +232,7 @@ export default {
             }).then(res => {
                 this.showCapNhat = false;
                 this.messageTraXe = "Cập nhật thành công";
+                //this.dsHopDong.find(hopDong => hopDong.idHopDong == this.idHopDong).tinhTrang = '';
             }).catch(err => {
                 this.showCapNhat = false;
                 this.messageTraXe = "Cập nhật thất bại. Vui lòng liên hệ Quản trị viên";
@@ -313,121 +295,6 @@ export default {
             });
         }
     },
-    
-    // mounted() {
-    //     console.log(this.showMS);
-    //     this.show = this.showMS;
-    // },
-    // computed: {
-    //     ...mapGetters(["dsNhacNo", "totalRows"])
-    // },
-    // created(){
-    //     this.getNhacNo();
-    //     this.setupSSE();
-    // },
-    // methods: {
-    //     ...mapActions([
-    //         "getToken", 
-    //         "fetchNhacNo", 
-    //         "deleteNhacNoAndGetMore",
-    //         "addHeadNhacNoList"
-    //     ]),
-    //     getNhacNo(){
-           
-    //         const params = {
-    //             tinhTrang: this.tinhTrang,
-    //             loai: this.loai,
-    //             limit: this.perPage,
-    //             offset: this.currentPage - 1
-    //         }
-    //         this.fetchNhacNo(params);
-    //     },
-    //     async setupSSE(){
-            
-    //         if (typeof(EventSource) === 'undefined') {
-    //             console.log('not support');
-    //             return;
-    //         }
-    //         const accessToken = await this.getToken();
-    //         var eventSourceInitDict = {headers: {'x-access-token': accessToken}};
-    //         var src = new EventSource('http://localhost:3000/api/nhacNoAddedEvent', eventSourceInitDict);
-            
-    //         src.onerror = function(e) {
-    //             if(e.eventPhase == EventSource.CLOSED){
-    //                 src.close();
-    //                 console.log("Event Source Closed");
-    //             }
-    //             else{
-    //                 console.log('error: ' + e);
-    //             }
-    //         }
-
-    //         src.addEventListener('NHACNO_ADDED', function(e) {
-    //             var data = JSON.parse(e.data);
-    //             //console.log(data);
-    //             this.addHeadNhacNoList(data);
-    //         }.bind(this), false);
-    //     },
-
-    //     // async getNhacNo(){
-    //     //     const accessToken = await this.getToken();
-
-    //     //     return axios.get("/nhacno", {
-    //     //         headers: {
-    //     //         "x-access-token": accessToken
-    //     //         },
-    //     //         params: {
-    //     //             tinhTrang: '',
-    //     //             loai: 0,
-    //     //             limit: this.perPage,
-    //     //             offset: this.currentPage - 1
-    //     //         }
-    //     //     })
-    //     //     .then(res => {
-    //     //         this.nhacNoList = res.data.listResult;
-    //     //         this.rows =res.data.totalItems;
-    //     //         return this.nhacNoList;
-    //     //     })
-    //     //     .catch(err => {
-    //     //         console.log(err);
-    //     //     });    
-    //     // },
-    //     async detailedNhacNo(){
-    //         console.log("event detailed");
-    //     },
-    //     async deleteNhacNo(row){
-    //         const info = {
-    //             idNhacNo: row.item.id,
-    //             tinhTrang: this.tinhTrang,
-    //             loai: this.loai,
-    //             limit: this.perPage,
-    //             offset: this.currentPage - 1
-    //         }
-    //         this.isBusy = !this.isBusy;
-    //         await this.deleteNhacNoAndGetMore(info);
-    //         this.isBusy = !this.isBusy; 
-    //     //     this.dsNhacNo.splice(row.index, 1);
-    //     //     console.log(this.dsNhacNo);
-
-    //     //     // const accessToken = await this.getToken();
-    //     //     // axios.delete(`/nhacno/${row.item.id}`, {
-    //     //     //     headers: {
-    //     //     //     "x-access-token": accessToken
-    //     //     //     }
-    //     //     // })
-    //     //     // .then(res => {
-    //     //     //     this.nhacNoList = res.data.listResult;
-    //     //     //     this.rows =res.data.totalItems;
-    //     //     //     return this.nhacNoList;
-    //     //     // })
-    //     //     // .catch(err => {
-    //     //     //     console.log(err);
-    //     //     // });
-    //     }
-    // },
-    // directives: {
-    //     money: VMoney
-    // }
 };
 </script>
 <style scoped>

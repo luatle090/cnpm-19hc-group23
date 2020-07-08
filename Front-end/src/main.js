@@ -62,26 +62,26 @@ store.dispatch("isLogin", localStorage.getItem("accessToken"));
  * Redirect page: If the user is not logged in, redirect to the login page
  * 
  */
-router.beforeEach((to, from, next) => {
-  if (to.path.includes("admin") && to.matched.some(record => record.meta.requiresAuth)) {
-    // this route requires auth, check if logged in
-    // if not, redirect to login page.
+// router.beforeEach((to, from, next) => {
+//   if (to.path.includes("admin") && to.matched.some(record => record.meta.requiresAuth)) {
+//     // this route requires auth, check if logged in
+//     // if not, redirect to login page.
     
-    if (!store.getters.getAuthenicated && to.path !== "/admin/login") {
-      next({
-        path: '/admin/login'
-      })
-    } else {
-      next()
-    }
-  } else {
-    if(!store.getters.getAuthenicated && to.path !== "/login" && !to.path.includes("admin"))
-      next('/login')
-    else{
-      next();
-    }
-  }
-});
+//     if (!store.getters.getAuthenicated && to.path !== "/admin/login") {
+//       next({
+//         path: '/admin/login'
+//       })
+//     } else {
+//       next()
+//     }
+//   } else {
+//     if(!store.getters.getAuthenicated && to.path !== "/login" && !to.path.includes("admin"))
+//       next('/login')
+//     else{
+//       next();
+//     }
+//   }
+// });
 
 /* eslint-disable no-new */
 new Vue({

@@ -34,16 +34,6 @@ app.use('/api/thanhtoan', verifyAccessToken, require('./routes/ThanhToan.route')
 app.use('/api/baoduong', verifyAccessToken, require('./routes/BaoDuong.route'));
 app.use('/api/tinhtrang', verifyAccessToken, require('./routes/TinhTrang.route'));
 app.use('/api/traxe', verifyAccessToken, require('./routes/TraXe.route'));
-//app.use('/api/lichsubaoduong', verifyAccessToken, require('./routes/LichSuBaoDuong.route'));
-//app.use('/api/khachhang', verifyAccessToken, require('./routes/KhachHang.route'));
-
-// ------------- old api ----------------
-// app.use('/api/lichsuchuyenkhoan', verifyAccessToken, require('./routes/lichsuchuyenkhoan.route'));
-// app.use('/api/lichsunhantien', verifyAccessToken, require('./routes/lichsunhantien.route'));
-// app.use('/api/nhacno', verifyAccessToken, require('./routes/nhacno.route'));
-// app.use('/api/taikhoannganhang', verifyAccessToken, require('./routes/taikhoannganhang.route'));
-// app.use('/api/thietlapnguoinhan', verifyAccessToken, require('./routes/thietlapnguoinhan.route'));
-// app.use('/api/nhacNoAddedEvent', verifyAccessToken, require('./routes/eventNhacNo').subscribeNhacNoAdded);
 
 app.use((req, res, next) => {
   throw createError(404, 'Resource not found.');

@@ -77,7 +77,7 @@
                 <div class="md-layout-item md-small-size-100 md-size-100 text-right">
                   <md-button type="button" to="/hopdong" class="btn-huy md-raised md-danger">Quay lại</md-button>
                   <md-button type="button" @click="showDialog = true" class="btn-huy md-raised md-success">Chi tiết</md-button>
-                  <md-button type="submit" class="md-raised md-success">Thanh toán hợp đồng</md-button>
+                  <md-button type="submit" v-show="showThanhToan" class="md-raised md-success">Thanh toán hợp đồng</md-button>
                 </div>
               </div>
             </md-card-content>
@@ -151,6 +151,7 @@ export default {
       message: "",
       title: "Thanh toán hợp đồng",
       showDialog : false,
+      showThanhToan : true,
       thanhToan: {
         maHopDong: "",
         hoTen: "",
@@ -201,12 +202,15 @@ export default {
     async getThanhToan(){
       const accessToken = await this.getToken();
 
-      axios.get(`/hopdong/payment/${this.$route.params.id}`, {
+      axios.get(`/thanhtoan/${this.$route.params.id}`, {
         headers: {
           "x-access-token": accessToken
         },
       }).then(res => {
         this.thanhToan = res.data.thanhToan;
+        if(this.thanhToan.tinhTrangHopDong === 8 || !this.thanhToan.tinhTrangKiemTra){
+          this.showThanhToan = false;
+        }
         this.thanhToan.ngayTraXe = new Date(this.thanhToan.ngayTraXe);
         this.thanhToan.ngayThueXe = new Date(this.thanhToan.ngayThueXe);
         this.chiTiet = res.data.chiTiet;
@@ -215,9 +219,31 @@ export default {
       });
     },
 
-    thanhToanHopDong(){
-      this.show = true;
-      this.message = "Thanh toán hợp đồng thành công";
+    async thanhToanHopDong(){
+      // this.show = true;
+      // this.message = "Thanh toán hợp đồng thành công";
+
+      const accessToken = await this.getToken();
+
+      axios({
+        method: 'patch',
+        url: `/thanhtoan/${this.$route.params.id}`,
+        headers: {
+          "x-access-token": accessToken
+        },
+      }).then(res => {
+        if(res.status === 200){
+          this.message = "Thanh toán hợp đồng thành công";
+          this.show = true;
+          this.showThanhToan = false;
+          //this.$router.push({ name: 'Xe Ô tô', params: { message: message, showMS: true } })
+        }
+      }).catch(err => {
+        this.message = "Thanh toán hợp đồng bị lỗi. Vui lòng liên hệ quản trị viên";
+        this.show = true;
+        this.erro = true;
+        //this.$router.push({ name: 'Xe Ô tô', params: { message: message, showMS: true, erro: true } })
+      });
     }
   },
    directives: {

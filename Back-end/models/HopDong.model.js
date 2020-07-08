@@ -101,8 +101,8 @@ module.exports = {
                 inner join phutung pt on pt.idPhuTung = ctkt.idPhuTung
                 where ctkt.tinhTrang = 7
               )
-              select hd.idHopDong, hd.maHopDong, hd.ngayThue as ngayThueXe,
-              hd.ngayTraXe as ngayTraXe , kh.hoTen, kh.CMND, kh.diaChi, kh.SDT,
+              select hd.idHopDong, hd.maHopDong, hd.ngayThue as ngayThueXe, hd.ngayTraXe as ngayTraXe,
+              kh.hoTen, kh.CMND, kh.diaChi, kh.SDT, hd.tinhTrangHopDong, hd.tinhTrangKiemTra, xe.idXeOto,
               xe.soHieuXe, ct.giaThue, ct.soTienDatCoc, ifnull(sum(cp.giaPhuTung), 0) as chiPhiDenBu,
               datediff(hd.ngayTraXe, hd.ngayThue) * ct.giaThue as giaNgayThue,
               datediff(hd.ngayTraXe, hd.ngayThue) * ct.giaThue + ifnull(sum(cp.giaPhuTung), 0) as tongCong
