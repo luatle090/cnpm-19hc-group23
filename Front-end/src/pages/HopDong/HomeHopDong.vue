@@ -116,13 +116,13 @@
 
         <md-card-content>
           <div class="md-layout primary">
-          <div class="md-layout-item md-size-90">
-              <div class="md-layout">
-                  <div class="md-layout-item md-small-size-100 md-size-100">
-                    <label>{{ messageTraXe }}</label>
-                  </div>
-              </div>
-          </div>
+            <div class="md-layout-item md-size-90">
+                <div class="md-layout">
+                    <div class="md-layout-item md-small-size-100 md-size-100">
+                        <label>{{ messageTraXe }}</label>
+                    </div>
+                </div>
+            </div>
           </div>
         </md-card-content>
 

@@ -18,11 +18,11 @@
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
                     <label>Họ tên</label>
-                    <md-input v-model.trim="hoTen" disabled type="text" ></md-input>
+                    <md-input v-model="hoTen" disabled type="text" ></md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
-                  <md-autocomplete required v-model.trim="hopDong.CMND" 
+                  <md-autocomplete required v-model="hopDong.CMND" 
                     :md-options="dsCMND"
                     @md-changed='getInfoKH'
                   >
@@ -32,7 +32,7 @@
                 <div class="md-layout-item md-small-size-100 md-size-100">
                   <md-field>
                     <label>Địa chỉ</label>
-                    <md-input v-model.trim="diaChi" disabled type="text" ></md-input>
+                    <md-input v-model="diaChi" disabled type="text" ></md-input>
                   </md-field>
                 </div>
                   <div class="md-layout-item md-small-size-100 md-size-100">
@@ -83,6 +83,7 @@
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100 text-right">
                   <md-button type="button" to="/hopdong" class="btn-huy md-raised md-danger">Quay lại</md-button>
+                  <md-button v-show="!update" type="button" class="btn-huy md-raised md-success" @click="showDialog = true">Thêm khách hàng </md-button>
                   <md-button v-show="!update" type="submit" class="md-raised md-success">Tạo hợp đồng</md-button>
                   <md-button v-show="update" type="submit" class="md-raised md-success">Cập nhật hợp đồng</md-button>
                 </div>
@@ -92,6 +93,55 @@
         </form>
       </div>
     </div>
+    <md-dialog :md-active.sync="showDialog">
+      <md-dialog-title>Thêm thông tin khách hàng</md-dialog-title>
+      
+          
+      <md-card-content>
+        <div class="md-layout primary" v-if="showMessage">
+          <div class="md-layout-item md-size-90">
+            <div class="md-layout">
+              <div class="md-layout-item md-small-size-100 md-size-100">
+                  <label>{{ message }}</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="md-layout primary" v-else>
+          <div class="md-layout-item md-small-size-100 md-size-100">
+            <md-field>
+              <label>Họ tên</label>
+              <md-input required v-model.trim="khachHang.hoTen" type="text"> </md-input>
+            </md-field>
+          </div>
+          <div class="md-layout-item md-small-size-100 md-size-100">
+            <md-field>
+              <label>CMND</label>
+              <md-input maxlength='9' v-model.trim="khachHang.CMND" required type="text" ></md-input>
+            </md-field>
+          </div>
+          <div class="md-layout-item md-small-size-100 md-size-100">
+            <md-field>
+              <label>Số điện thoại</label>
+              <md-input v-model.number="khachHang.SDT" required type="text" maxlength='9' ></md-input>
+            </md-field>
+          </div>
+          <div class="md-layout-item md-small-size-100 md-size-100">
+            <md-field>
+              <label>Địa chỉ</label>
+              <md-input v-model.trim="khachHang.diaChi" required type="text" ></md-input>
+            </md-field>
+          </div>
+        </div>
+      </md-card-content>
+
+      <md-dialog-actions>
+        <md-button class="md-danger md-raised" @click="resetDialog">Đóng</md-button>
+        <md-button class="md-primary" v-show="!showMessage" @click="themMoiKhachHang">Xán nhận</md-button>
+      </md-dialog-actions>
+    </md-dialog>
+
   </div>
 </template>
 <script>
@@ -115,6 +165,7 @@ export default {
       tenHangXe: "",
       tenDongXe: "",
       giaThue: null,
+      showDialog: false,
       tienDatCoc: null,
       hopDong: {
         maHopDong: "",
@@ -129,11 +180,21 @@ export default {
       dsSoHieuXe: [],
       dsCMND: [],
 
+      message: '',
+      showMessage: false,
+      khachHang: {
+        SDT: "",
+        CMND: "",
+        hoTen: "",
+        diaChi: "",
+      },
+
       title: "Tạo hợp đồng"
     };
   },
 
   async mounted() {
+    this.mapKhachHang = new Map();
     await this.getXeOto();
     await this.getKhachHang();
     if(this.update === true){
@@ -203,7 +264,6 @@ export default {
         }
       }).then(res => {
         this.dsKhachHang = res.data;
-        this.mapKhachHang = new Map();
         for(const obj of this.dsKhachHang){
           this.mapKhachHang.set(obj.CMND, obj);
           this.dsCMND.push(obj.CMND);    
@@ -294,7 +354,41 @@ export default {
         const message = "Cập nhật hợp đồng bị lỗi. Vui lòng liên hệ quản trị viên";
         this.$router.push({ name: 'Hợp đồng', params: { message: message, showMS: true, erro: true } })
       });
+    },
+
+    async themMoiKhachHang(){
+      const accessToken = await this.getToken();
+      this.showMessage = true;
+      axios({
+        method: 'post',
+        url: '/khachhang',
+        headers: {
+          "x-access-token": accessToken
+        },
+        data: this.khachHang
+      }).then(res => {
+        this.message = 'Thêm thành công khách hàng';
+        this.khachHang.idKhachHang = res.data.id;
+        this.hopDong.CMND = this.khachHang.CMND;
+        
+        //thêm vào ds CMND và mapKhachHang
+        this.mapKhachHang.set(this.khachHang.CMND.toString(), this.khachHang);
+        this.dsCMND.push(this.khachHang.CMND.toString());
+
+      }).catch( err => {
+        this.message = 'Có lỗi xảy ra. Vui lòng liên hệ Quản trị viên';
+      });
+    },
+
+    resetDialog(){
+      this.showMessage = false;
+      this.khachHang.hoTen = ""
+      this.khachHang.CMND = ""
+      this.khachHang.diaChi = "";
+      this.khachHang.SDT = "";
+      this.showDialog = false;
     }
+
   },
 };
 </script>

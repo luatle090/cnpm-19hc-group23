@@ -104,8 +104,8 @@ module.exports = {
               select hd.idHopDong, hd.maHopDong, hd.ngayThue as ngayThueXe, hd.ngayTraXe as ngayTraXe,
               kh.hoTen, kh.CMND, kh.diaChi, kh.SDT, hd.tinhTrangHopDong, hd.tinhTrangKiemTra, xe.idXeOto,
               xe.soHieuXe, ct.giaThue, ct.soTienDatCoc, ifnull(sum(cp.giaPhuTung), 0) as chiPhiDenBu,
-              datediff(hd.ngayTraXe, hd.ngayThue) * ct.giaThue as giaNgayThue,
-              datediff(hd.ngayTraXe, hd.ngayThue) * ct.giaThue + ifnull(sum(cp.giaPhuTung), 0) as tongCong
+              if(datediff(hd.ngayTraXe, hd.ngayThue) = 0, 1, datediff(hd.ngayTraXe, hd.ngayThue)) * ct.giaThue as giaNgayThue,
+              if(datediff(hd.ngayTraXe, hd.ngayThue) = 0, 1, datediff(hd.ngayTraXe, hd.ngayThue)) * ct.giaThue + ifnull(sum(cp.giaPhuTung), 0) as tongCong
               from hopdong hd
               inner join khachHang kh on kh.idKhachHang = hd.idKhachHang
               inner join chitiethopdong ct on hd.idHopDong = ct.idHopDong

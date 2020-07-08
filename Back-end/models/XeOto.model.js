@@ -104,7 +104,7 @@ module.exports = {
                   inner join chitiethopdong ct on xe.idXeOto = ct.idXeOto
                   inner join hopdong hd on ct.idHopDong = hd.idHopDong
                   where ('${entity.soHieuXe}' = '' or xe.soHieuXe like '%${entity.soHieuXe}%')
-                  and xe.tinhTrangXe in (5,6) and hd.tinhTrangHopDong = 3`;
+                  and xe.tinhTrangXe in (5,6) and hd.tinhTrangHopDong in (5, 6)`;
     return db.load(sql);
   },
 
