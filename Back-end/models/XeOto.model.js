@@ -77,6 +77,51 @@ module.exports = {
     return db.load(sql);
   },
 
+
+  getListXeKhachTra: (entity, limit, offset) => {
+    const sql = `select xe.idXeOto, xe.soHieuXe, tt.moTa, DATE_FORMAT(hd.ngayTraXe, "%d/%m/%Y") as ngayTraXe,
+                   dx.tenDongXe, hx.tenHangXe, hd.idHopDong, hd.maHopDong, 
+                   DATE_FORMAT(hd.ngayKiemTra, "%d/%m/%Y") as ngayKiemTra
+                  from xeoto xe
+                  inner join dongxe dx on xe.idDongXe = dx.idDongXe
+                  inner join hangxe hx on dx.idHangXe = hx.idHangXe
+                  inner join tinhtrang tt on xe.tinhTrangXe = tt.idTinhTrang
+                  inner join chitiethopdong ct on xe.idXeOto = ct.idXeOto
+                  inner join hopdong hd on ct.idHopDong = hd.idHopDong
+                  where ('${entity.soHieuXe}' = '' or xe.soHieuXe like '%${entity.soHieuXe}%')
+                  and xe.tinhTrangXe in (5,6) and hd.tinhTrangHopDong = 3
+                  order by xe.idXeOto
+                  limit ${limit} offset ${offset}`;
+    return db.load(sql);
+  },
+
+  countListXeKhachTra: (entity) => {
+    const sql = `select count(xe.idXeOto) as total
+                  from xeoto  xe
+                  inner join dongxe dx on xe.idDongXe = dx.idDongXe
+                  inner join hangxe hx on dx.idHangXe = hx.idHangXe
+                  inner join tinhtrang tt on xe.tinhTrangXe = tt.idTinhTrang
+                  inner join chitiethopdong ct on xe.idXeOto = ct.idXeOto
+                  inner join hopdong hd on ct.idHopDong = hd.idHopDong
+                  where ('${entity.soHieuXe}' = '' or xe.soHieuXe like '%${entity.soHieuXe}%')
+                  and xe.tinhTrangXe in (5,6) and hd.tinhTrangHopDong = 3`;
+    return db.load(sql);
+  },
+
+  getXeKhachTraById(id){
+    const sql = `select hd.ngayKiemTra, tt.moTa as tinhTrangBaoDuong, pt.tenPhuTung, ct.idPhuTung,
+                   tt2.moTa as tinhTrangPhuTung, xe.soHieuXe
+                  from xeoto xe
+                  inner join tinhtrang tt on xe.tinhTrangXe = tt.idTinhTrang
+                  inner join chitietkiemtra ctkt on ctkt.idXeOto = xe.idXeOto
+                  inner join hopdong hd on ctkt.idHopDong = hd.idHopDong
+                  inner join phutung pt on pt.idPhuTung = ctkt.idPhuTung
+                  inner join tinhtrang tt2 on ctkt.tinhTrang = tt2.idTinhTrang
+                  where xe.idXeOto = ${id}
+                  and xe.tinhTrangXe = 6 and hd.tinhTrangHopDong = 3`;
+    return db.load(sql);
+  },
+
   add: entity => db.add(entity, 'xeoto'),
   del: id => db.del({ id: id }, 'xeoto'),
   patch: (id, entity) => {
