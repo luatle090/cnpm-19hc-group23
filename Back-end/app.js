@@ -34,6 +34,7 @@ app.use('/api/thanhtoan', verifyAccessToken, require('./routes/ThanhToan.route')
 app.use('/api/baoduong', verifyAccessToken, require('./routes/BaoDuong.route'));
 app.use('/api/tinhtrang', verifyAccessToken, require('./routes/TinhTrang.route'));
 app.use('/api/traxe', verifyAccessToken, require('./routes/TraXe.route'));
+app.use('/api/baocao', verifyAccessToken, require('./routes/BaoCao.route'));
 
 app.use((req, res, next) => {
   throw createError(404, 'Resource not found.');

@@ -157,14 +157,169 @@ router.post('/export', async (req, res) => {
   if(row.length === 0){
     res.status(204).end();
   } else {
+    let entity = row[0];
+    entity.ngayThueXe = moment(entity.ngayThueXe).format('DD/MM/YYYY');
+    entity.ngayTraXe = moment(entity.ngayTraXe).format('DD/MM/YYYY');
     const giaThue = lib.phanCachTien(row[0].giaThue);
     const tienDatCoc = lib.phanCachTien(row[0].soTienDatCoc);
 
     var documentDefinition = {
+      header: {
+        fontSize: 9,
+        italics: true,
+        margin: [10, 10, 0, 0],
+        text: 'Công ty Thuê Xe Chuyên nghiệp'
+      },
       content: [
-          `Hello ` ,
-          'Nice to meet you!'
-      ]        
+        {
+          text: 'Hợp đồng thuê xe',
+          style: 'title',
+          alignment: 'center'
+        },
+       
+        {
+          type: 'upper-alpha',
+          style: 'header',
+          ol: [
+            'Thông tin người thuê'
+          ]
+        },
+        {
+          style: 'tableExample',
+          layout: 'noBorders',
+          table: {
+            widths: [40, '*', 100, 40, '*'],
+            body: [
+              ['Họ tên', `${entity.hoTen}`, '', 'SĐT', `${entity.SDT}`],
+              ['Địa chỉ', `${entity.diaChi}`, '', 'CMND', `${entity.CMND}`],
+            ]
+          }
+        },
+        {
+          type: 'upper-alpha',
+          start: 2,
+          style: 'header',
+          ol: [
+            'Thông tin xe thuê'
+          ]
+        },
+        {
+          style: 'tableExample',
+          layout: 'noBorders',
+          table: {
+            widths: ['auto', 80, 'auto', 80, 'auto'],
+            body: [
+              [
+                {text: 'Số hiệu xe', style: 'tableHeader'},
+                '',
+                {text: 'Hãng xe', style: 'tableHeader'},
+                '',
+                {text: 'Dòng xe', style: 'tableHeader'}
+              ],
+              [
+                `${entity.soHieuXe}`, '',`${entity.tenHangXe}`, '',`${entity.tenDongXe}`
+              ],
+              [
+                {text: '', style: 'marginRowTable'},'','','',''
+              ],
+              [
+                {text: 'Ngày thuê', style: 'tableHeader'},
+                '',
+                {text: 'Ngày trả xe', style: 'tableHeader'},
+                '',''
+              ],
+              [
+                entity.ngayThueXe, '', entity.ngayTraXe, '', ''
+              ],
+              [
+                {text: '', style: 'marginRowTable'},'','','',''
+              ],
+              [
+                {text: 'Giá thuê', style: 'tableHeader'}, 
+                '',
+                {text: 'Tiền đặt cọc', style: 'tableHeader'}, 
+                '', ''
+              ],
+              [
+                giaThue, '', tienDatCoc, '', ''
+              ],
+            ]
+          },
+        },
+        {
+          type: 'square',
+          italics: true,
+          margin: [0, 40, 0, 10],
+          ul: ['Điều khoản hợp đồng', 
+            {
+              ul: [
+                {
+                  style: 'contentDieuKhoan',
+                  text: [
+                    'Đồng tiền thanh toán có thể giống hoặc khác với đồng tiền tính giá.',
+                    ' Khi hai đồng tiền này khác nhau cần xác định tỷ giá quy đổi hai đồng tiền này, trong đó',
+                    ' đặc biệt lựa chọn tỷ giá của công cụ thanh toán nào, tỷ giá mua vào hay bán ra...'
+                  ]
+                },
+                {
+                  style: 'contentDieuKhoan',
+                  text: 'Thời hạn thanh toán: thanh toán trước giao hàng, ngay khi giao hàng và sau khi giao hàng.',
+                },
+                {
+                  style: 'contentDieuKhoan',
+                  text:  'Phương thức thanh toán: phương thức nhờ thu, phương thức tín dụng chứng từ, phương thức chuyển tiền, phương thức chuyển khoản',
+                },
+                {
+                  style: 'contentDieuKhoan',
+                  text: 'Điều kiện đảm bảo hối đoái do các bên thỏa thuận để tránh tổn thất có thể xảy ra kho các đồng tiên sụt giá hoặc tăng giá.',
+                }, 
+                {
+                  style: 'contentDieuKhoan',
+                  text: [
+                    'Chứng từ thanh toán: các bên nên quy định rõ việc người bán phải cung cấp ',
+                    'cho ngươi mua những chứng từ chứng minh đã giao hàng cho người vận tải ',
+                    'như hai bên đã thỏa thuận: hối phiếu, vận đơn, hóa đơn bán hàng, bảng kê ',
+                    'chi tiết hàng hóa, giấy chứng nhận xuất xứ.'
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+      ],
+      styles: {
+        marginRowTable:{
+          margin: [0, 0, 0, 12]
+        },
+        tableExample: {
+          margin: [20, 5, 0, 15]
+        },
+        title: {
+          fontSize: 18,
+          bold: true,
+          alignment: 'justify',
+          margin: [0, 40, 0, 20]
+        },
+        header: {
+          fontSize: 14,
+          bold: true,
+          margin: [0, 20, 0, 10]
+        },
+        contentDieuKhoan: {
+          fontSize: 10,
+          alignment: 'justify',
+        },
+        content: {
+          alignment: 'justify',
+        },
+        tableHeader: {
+          bold: true,
+          color: 'black'
+        }
+      },
+      defaultStyle: {
+        fontSize: 12
+      }        
     };
     const pdfDoc = pdfMake.createPdf(documentDefinition);
     pdfDoc.getBase64((data)=>{
