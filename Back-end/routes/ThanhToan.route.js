@@ -76,7 +76,6 @@ router.patch('/:id', async (req, res) => {
       tinhTrangThue: 4,
       tinhTrangXe: rows[0].tinhTrangKiemTra,
     }
-    console.log(entityXe)
     
     await xeModel.patch(rows[0].idXeOto, entityXe);
 

@@ -83,7 +83,8 @@
                                         <md-icon>save_alt</md-icon>
                                         </div></div>
                                     </button>
-                                    <button title="Thanh toán hợp đồng" type="button" 
+                                    <button title="Thanh toán hợp đồng" type="button"
+                                        v-show="row.item.tinhTrang == 'Đã kiểm tra' || row.item.tinhTrang == 'Hoàn tất'"
                                         @click="thanhToanHopDong(row.item.idHopDong)"
                                         class="md-button md-just-icon md-theme-default md-info md-simple"
                                     >

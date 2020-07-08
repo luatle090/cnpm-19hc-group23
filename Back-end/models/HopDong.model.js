@@ -88,7 +88,7 @@ module.exports = {
                 from xeoto xe
                 inner join chitiethopdong ct on xe.idXeOto = ct.idXeOto
                 inner join hopdong hd on ct.idHopDong = hd.idHopDong
-                where xe.tinhTrangXe = 5 and hd.tinhTrangHopDong = 3
+                where xe.tinhTrangXe = 5 and hd.tinhTrangHopDong = 5
                 and xe.idXeOto = ${id}`;
     return db.load(sql);
   },

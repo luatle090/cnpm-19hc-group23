@@ -112,7 +112,8 @@ router.post('/', async (req, res) => {
         const entityHopDong = {
             idHopDong: rows[0].idHopDong,
             ngayKiemTra: req.body.ngayKiemTra,
-            tinhTrangKiemTra: req.body.tinhTrangKiemTra
+            tinhTrangKiemTra: req.body.tinhTrangKiemTra,
+            tinhTrangHopDong: 6
         }
         
         const rowsHopDong = await hopDongModel.patch(entityHopDong.idHopDong, entityHopDong);
@@ -156,7 +157,8 @@ router.patch('/', async (req, res) => {
    //cap nhat ngay tra xe
    const ngayTraXe = moment().format("YYYY-MM-DD HH:mm:ss");
    const entityHopDong = {
-       ngayTraXe
+       ngayTraXe,
+       tinhTrangHopDong: 5
    }
 
    await hopDongModel.patch(idHopDong, entityHopDong);
