@@ -77,7 +77,7 @@
                 <div class="md-layout-item md-small-size-100 md-size-100 text-right">
                   <md-button type="button" to="/hopdong" class="btn-huy md-raised md-danger">Quay lại</md-button>
                   <md-button type="button" @click="showDialog = true" class="btn-huy md-raised md-success">Chi tiết đền bù</md-button>
-                  <md-button type="button" v-show="showExport" @click="exportHoaDon" class="btn-huy md-raised md-success">Xuất hóa đơn</md-button>
+                  <!-- <md-button type="button" v-show="showExport" @click="exportHoaDon" class="btn-huy md-raised md-success">Xuất hóa đơn</md-button> -->
                   <md-button type="submit" v-show="showThanhToan" class="md-raised md-success">Thanh toán hợp đồng</md-button>
                 </div>
               </div>

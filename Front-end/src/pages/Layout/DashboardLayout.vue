@@ -114,9 +114,9 @@ export default {
   },
   data(){
     return{
-      quanLy: true,
-      nvThueXe: true,
-      nvBaoDuong: true, 
+      quanLy: false,
+      nvThueXe: false,
+      nvBaoDuong: false, 
     }
   },
   mounted() {
