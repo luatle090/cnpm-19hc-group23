@@ -122,9 +122,14 @@ const routes = [
         ]
       },
       {
-        path: "baocao",
-        name: "Báo cáo",
+        path: "baocaodoanhthu",
+        name: "Báo cáo doanh thu",
         component: () => import("../pages/BaoCao/BaoCaoDoanhSo"),
+      },
+      {
+        path: "baocaochitieu",
+        name: "Báo cáo chi tiêu",
+        component: () => import("../pages/BaoCao/BaoCaoChiTieu"),
       },
     ],
   },

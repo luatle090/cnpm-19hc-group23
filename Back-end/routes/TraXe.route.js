@@ -55,7 +55,7 @@ router.get('/:id', async (req, res) => {
 
     const rows = await xeModel.getXeKhachTraById(id);
     if(rows.length === 0){
-        res.status(204);
+        res.status(204).end();
     }
     else{
         let entity = {
@@ -104,7 +104,7 @@ router.post('/', async (req, res) => {
 
     const rows = await hopDongModel.getHopDongByIdXe(req.body.idXeOto);
     if(rows.length === 0 ){
-        res.status(204);
+        res.status(204).end();
     }
     else {
 

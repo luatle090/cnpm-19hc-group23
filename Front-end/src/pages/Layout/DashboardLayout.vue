@@ -23,10 +23,23 @@
         <md-icon>content_paste</md-icon>
         <p>Xe Ô tô</p>
       </sidebar-link>
-      <sidebar-link v-show="quanLy"  to="/baocao">
+      <!-- <sidebar-link to="/baocao">
         <md-icon>content_paste</md-icon>
         <p>Báo cáo</p>
-      </sidebar-link>
+      </sidebar-link> -->
+      <li to="/" v-show="quanLy">
+        <a href="#" v-b-toggle.collapse-lichsu class="nav-link sidebar-menu-item sidebar-menu-padding-left">
+          <md-icon>content_paste</md-icon>
+          <p>Báo cáo <b class="caret"></b></p></a>
+          <b-collapse id="collapse-lichsu" accordion="my-accordion" style="animation-fill-mode: both; animation-timing-function: ease-out;">
+            <sidebar-link to="/baocaodoanhthu">
+              <p>Doanh thu</p>
+            </sidebar-link>
+            <sidebar-link to="/baocaochitieu">
+              <p>Chi tiêu</p>
+            </sidebar-link>
+          </b-collapse>
+      </li>
 
       <!-- <sidebar-link to="/user">
         <md-icon>person</md-icon>

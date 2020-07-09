@@ -10,7 +10,7 @@ router.get('/:id', async (req, res) => {
   const rows = await hopDongModel.getInfoPaymentByIdHopDong(req.params.id);
   const rowsChiTiet = await hopDongModel.getChiTietDenBuByIdHopDong(req.params.id);
   if(rows.length === 0){
-    res.status(204);
+    res.status(204).end();
   } else {
     let entity = {
       thanhToan: rows[0],
@@ -58,7 +58,7 @@ router.patch('/:id', async (req, res) => {
 
   const rows = await hopDongModel.getInfoPaymentByIdHopDong(req.params.id);
   if(rows.length === 204){
-    res.status(204);
+    res.status(204).end();
   }
   else {
     //update tinh trang hop dong, phi boi thuong, tong tien

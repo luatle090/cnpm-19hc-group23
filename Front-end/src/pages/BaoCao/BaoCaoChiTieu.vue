@@ -51,14 +51,14 @@ import { mapActions } from "vuex";
 export default {
     data() {
         return {
-            title: 'Báo cáo doanh số',
+            title: 'Báo cáo chi tiêu',
             baoCao: 'ngay',
             ngayBaoCao: null,
             headers: [
                 'STT',
                 { key: 'ngay', label: 'Ngày' },
-                { key: 'soLuongKhach', label: 'Số lượng khách' },
-                { key: 'doanhThu', label: 'Doanh thu' },
+                { key: 'tenPhuTung', label: 'Tên phụ tùng' },
+                { key: 'giaPhuTung', label: 'Giá phụ tùng' },
             ],
 
             dsBaoCao: [],
@@ -74,7 +74,7 @@ export default {
             const ngayBaoCao = Number(this.ngayBaoCao);
             axios({
                 method: 'get',
-                url: '/baocao/doanhthu',
+                url: '/baocao/chi',
                 headers: {
                     "x-access-token": accessToken
                 },

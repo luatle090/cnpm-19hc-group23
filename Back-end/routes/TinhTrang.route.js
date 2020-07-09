@@ -12,7 +12,7 @@ router.get('/:code', async (req, res) => {
     const code = req.params.code;
     const rows = await tinhTrangModel.loadByCode(code);
     if(rows.length === 0){
-        res.status(204);
+        res.status(204).end();
     }
     else {
         res.json(rows);

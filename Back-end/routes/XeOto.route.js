@@ -51,7 +51,7 @@ router.get('/', async (req, res) => {
 router.get('/allsohieuxe', async (req, res) => {
   const row = await xeModel.getAllSoHieuXe();
   if(row.length === 0){
-    res.status(204);
+    res.status(204).end();
   }
   else{
     res.json(row);
@@ -61,7 +61,7 @@ router.get('/allsohieuxe', async (req, res) => {
 router.get('/allsohieuxe/:sohieuxe', async (req, res) => {
   const row = await xeModel.getAllSoHieuXe();
   if(row.length === 0){
-    res.status(204);
+    res.status(204).end();
   }
   else{
     console.log(row[0]);
@@ -78,7 +78,7 @@ router.get('/:id', async (req, res) => {
 
   const row = await xeModel.loadById(id);
   if(row.length === 0){
-    res.status(204);
+    res.status(204).end();
   }
   else{
     delete row[0].hanBaoDuong;
