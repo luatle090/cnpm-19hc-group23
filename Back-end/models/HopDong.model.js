@@ -102,6 +102,7 @@ module.exports = {
                 where ctkt.tinhTrang = 7
               )
               select hd.idHopDong, hd.maHopDong, hd.ngayThue as ngayThueXe, hd.ngayTraXe as ngayTraXe,
+              hx.tenHangXe, dx.tenDongXe,
               kh.hoTen, kh.CMND, kh.diaChi, kh.SDT, hd.tinhTrangHopDong, hd.tinhTrangKiemTra, xe.idXeOto,
               xe.soHieuXe, ct.giaThue, ct.soTienDatCoc, ifnull(sum(cp.giaPhuTung), 0) as chiPhiDenBu,
               if(datediff(hd.ngayTraXe, hd.ngayThue) = 0, 1, datediff(hd.ngayTraXe, hd.ngayThue)) * ct.giaThue as giaNgayThue,
@@ -110,16 +111,19 @@ module.exports = {
               inner join khachHang kh on kh.idKhachHang = hd.idKhachHang
               inner join chitiethopdong ct on hd.idHopDong = ct.idHopDong
               inner join xeoto xe on xe.idXeOto = ct.idXeOto
+              inner join dongxe dx on xe.idDongXe = dx.idDongXe
+              inner join hangxe hx on dx.idHangXe = hx.idHangXe
               left join chiPhi cp on hd.idHopDong = cp.idHopDong
               where hd.idHopDong = ${id}`;
     return db.load(sql);
   },
 
   getChiTietDenBuByIdHopDong: (id) =>{
-    const sql = ` select pt.giaPhuTung , pt.idPhuTung
+    const sql = ` select pt.giaPhuTung , pt.idPhuTung, pt.tenPhuTung
                 from chitietkiemtra ctkt
                 inner join phutung pt on pt.idPhuTung = ctkt.idPhuTung
-                where ctkt.tinhTrang = 7 and ctkt.idHopDong = ${id}`;
+                where ctkt.tinhTrang = 7 and ctkt.idHopDong = ${id}
+                order by pt.idPhuTung`;
     return db.load(sql);
   },
 

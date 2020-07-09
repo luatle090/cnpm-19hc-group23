@@ -43,7 +43,7 @@ module.exports = {
                   and ('${entity.idHangXe}' = '' or hx.idHangXe = '${entity.idHangXe}')
                   and ('${entity.idDongXe}' = '' or dx.idDongXe = '${entity.idDongXe}')
                   and ('${entity.idLoaiXe}' = '' or lx.idLoaiXe = '${entity.idLoaiXe}')
-                  and ('${entity.tinhTrangXe}' = '' or xe.tinhTrangXe = '${entity.tinhTrangXe}')
+                  and ('${entity.tinhTrangThue}' = '' or xe.tinhTrangThue = '${entity.tinhTrangThue}')
                   order by xe.idXeOto
                   limit ${limit} offset ${offset}`;
     return db.load(sql);
@@ -60,7 +60,7 @@ module.exports = {
                   and ('${entity.idHangXe}' = '' or hx.idHangXe = '${entity.idHangXe}')
                   and ('${entity.idDongXe}' = '' or dx.idDongXe = '${entity.idDongXe}')
                   and ('${entity.idLoaiXe}' = '' or lx.idLoaiXe = '${entity.idLoaiXe}')
-                  and ('${entity.tinhTrangXe}' = '' or xe.tinhTrangXe = '${entity.tinhTrangXe}')`;
+                  and ('${entity.tinhTrangThue}' = '' or xe.tinhTrangThue = '${entity.tinhTrangThue}')`;
     return db.load(sql);
   },
 

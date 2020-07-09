@@ -52,8 +52,8 @@
                                 <md-field>
                                     <md-select v-model="filter.tinhTrang">
                                         <md-option value="-1">Tình trạng xe</md-option>
-                                        <md-option value="1">Sendai</md-option>
-                                        <md-option value="2">SUV</md-option> 
+                                        <md-option value="3">Đang thuê</md-option>
+                                        <md-option value="4">Nhàn rỗi</md-option> 
                                     </md-select>
                                 </md-field>
                             </div>
@@ -221,6 +221,9 @@ export default {
             }
             if(-1 !== Number(this.filter.hangXe)){
                 properties.idHangXe = this.filter.hangXe;
+            }
+            if(-1 !== Number(this.filter.tinhTrang)){
+                properties.tinhTrangThue = this.filter.tinhTrang;
             }
 
 

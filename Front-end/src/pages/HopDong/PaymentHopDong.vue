@@ -76,7 +76,8 @@
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100 text-right">
                   <md-button type="button" to="/hopdong" class="btn-huy md-raised md-danger">Quay lại</md-button>
-                  <md-button type="button" @click="showDialog = true" class="btn-huy md-raised md-success">Chi tiết</md-button>
+                  <md-button type="button" @click="showDialog = true" class="btn-huy md-raised md-success">Chi tiết đền bù</md-button>
+                  <md-button type="button" v-show="showExport" @click="exportHoaDon" class="btn-huy md-raised md-success">Xuất hóa đơn</md-button>
                   <md-button type="submit" v-show="showThanhToan" class="md-raised md-success">Thanh toán hợp đồng</md-button>
                 </div>
               </div>
@@ -152,6 +153,7 @@ export default {
       title: "Thanh toán hợp đồng",
       showDialog : false,
       showThanhToan : true,
+      showExport: false,
       thanhToan: {
         maHopDong: "",
         hoTen: "",
@@ -211,6 +213,9 @@ export default {
         if(this.thanhToan.tinhTrangHopDong === 8 || !this.thanhToan.tinhTrangKiemTra){
           this.showThanhToan = false;
         }
+        if(this.thanhToan.tinhTrangHopDong === 8){
+          this.showExport = true;
+        }
         this.thanhToan.ngayTraXe = new Date(this.thanhToan.ngayTraXe);
         this.thanhToan.ngayThueXe = new Date(this.thanhToan.ngayThueXe);
         this.chiTiet = res.data.chiTiet;
@@ -236,6 +241,8 @@ export default {
           this.message = "Thanh toán hợp đồng thành công";
           this.show = true;
           this.showThanhToan = false;
+          this.showExport = true;
+          this.exportHoaDon();
           //this.$router.push({ name: 'Xe Ô tô', params: { message: message, showMS: true } })
         }
       }).catch(err => {
@@ -243,6 +250,30 @@ export default {
         this.show = true;
         this.erro = true;
         //this.$router.push({ name: 'Xe Ô tô', params: { message: message, showMS: true, erro: true } })
+      });
+    },
+
+    async exportHoaDon(){
+      const id = this.$route.params.id;
+      const accessToken = await this.getToken();
+      axios({
+          method: 'post',
+          url: '/thanhtoan/export',
+          headers: {
+              "x-access-token": accessToken
+          },
+          responseType: 'arraybuffer',
+          data:{
+              id
+          },
+      }).then(res => {
+          
+          let blob = new Blob([res.data], { type: 'application/pdf' }),
+          url = window.URL.createObjectURL(blob)
+
+          window.open(url) 
+      }).catch(err => {
+          console.log(err);
       });
     }
   },

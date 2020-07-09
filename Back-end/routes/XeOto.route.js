@@ -9,14 +9,14 @@ router.get('/', async (req, res) => {
   const soHieuXe = req.query.soHieuXe || '';
   const idHangXe = req.query.idHangXe || '';
   const idDongXe = req.query.idDongXe || '';
-  const tinhTrangXe = req.query.tinhTrangXe || '';
+  const tinhTrangThue = req.query.tinhTrangThue || '';
   const idLoaiXe = req.query.idLoaiXe || '';
   const entity = {
       soHieuXe,
       idHangXe,
       idDongXe,
       idLoaiXe,
-      tinhTrangXe
+      tinhTrangThue
   }
   if(isNaN(req.query.limit)){
     throw createError(400, 'Invalid limit.');
